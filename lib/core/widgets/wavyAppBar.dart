@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:gradproject/core/constants/colours/colours.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
+
 
 class Wavyappbar extends StatelessWidget {
   const Wavyappbar({super.key});

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:gradproject/core/constants/colours/colours.dart';
-import 'package:gradproject/core/widgets/wavyAppBar.dart';
-import 'package:gradproject/pages/SignIn.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
+import 'package:grad_project/core/widgets/wavyAppBar.dart';
+import 'package:grad_project/pages/SignIn.dart';
 import '../core/constants/strings/strings.dart';
 
 class Splashscreen extends StatelessWidget {

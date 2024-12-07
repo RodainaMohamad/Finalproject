@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:gradproject/core/constants/colours/colours.dart';
-import 'package:gradproject/core/widgets/wavyAppBar.dart';
-import 'package:step_progress_indicator/step_progress_indicator.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
+import 'package:grad_project/core/widgets/wavyAppBar.dart';
+import 'package:grad_project/pages/create_account_patient.dart';
 import '../core/widgets/bottomBar.dart';
 
 class Signin extends StatefulWidget {
@@ -222,11 +222,11 @@ class _Signin extends State<Signin> {
                           height: 50,
                           width: 220,
                           child: ElevatedButton(
-                            onPressed: () => _updateBorder('Don’t have an account'),
+                            onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => CreateAccountScreen()));},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: secondary,
                               shape: RoundedRectangleBorder(
-                                borderRadius:BorderRadius.all(Radius.circular(10)),
+                                borderRadius: BorderRadius.all(Radius.circular(10)),
                                 side: BorderSide(width: 2, color: yesBorderColor),
                               ),
                             ),
