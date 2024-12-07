@@ -253,7 +253,7 @@ class _Signin extends State<Signin> {
               ],
             ),
           ),
-         const SizedBox(height:58),
+          const SizedBox(height:58),
           bottomNavigationBar = const BottomBar(),
         ],
       ),
