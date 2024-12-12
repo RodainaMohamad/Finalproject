@@ -3,9 +3,13 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/wavyAppBar.dart';
 import 'package:grad_project/pages/create_account_patient.dart';
+import 'package:grad_project/pages/whoRU.dart';
 import '../core/widgets/bottomBar.dart';
 
 class Signin extends StatefulWidget {
+
+  static const String routeName = 'Signin';
+
   const Signin({super.key});
 
   @override
@@ -38,6 +42,7 @@ class _Signin extends State<Signin> {
   Widget build(BuildContext context) {
     var bottomNavigationBar;
     return Scaffold(
+      resizeToAvoidBottomInset: false, // avoiding overflow of pixels when keyboard appears when entering data
       backgroundColor: primary,
       body: Column(
         children: [
@@ -54,12 +59,12 @@ class _Signin extends State<Signin> {
                 const SizedBox(height: 5),
                 Text(
                   'Welcome',
-                  style: GoogleFonts.nunito(
+                    style: GoogleFonts.nunito(
                     fontSize: 30,
                     height: 1.364,
                     fontWeight: FontWeight.w700,
                     color: secondary,
-                  ),
+                ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height:5),
@@ -222,7 +227,7 @@ class _Signin extends State<Signin> {
                           height: 50,
                           width: 220,
                           child: ElevatedButton(
-                            onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => CreateAccountScreen()));},
+                            onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => DoctorPation()));},
                             style: ElevatedButton.styleFrom(
                               backgroundColor: secondary,
                               shape: RoundedRectangleBorder(

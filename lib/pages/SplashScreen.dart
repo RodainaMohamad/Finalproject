@@ -5,6 +5,9 @@ import 'package:grad_project/pages/SignIn.dart';
 import '../core/constants/strings/strings.dart';
 
 class Splashscreen extends StatelessWidget {
+
+  static const String routeName = 'Splashscreen';
+
   const Splashscreen({super.key});
 
   @override

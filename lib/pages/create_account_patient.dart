@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
+import 'package:grad_project/core/widgets/wavyAppBar.dart';
 
 class CreateAccountScreen extends StatefulWidget {
+
+  static const String routeName = 'CreateAccountScreen';
+
   @override
   _CreateAccountScreenState createState() => _CreateAccountScreenState();
 }
@@ -25,16 +30,10 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0XFF5DC1C3),
+      backgroundColor:primary,
       body: Column(
         children: [
-          ClipPath(
-            clipper: WaveClipperOne(flip: true),
-            child: Container(
-              height: 120,
-              color: Colors.white,
-            ),
-          ),
+          Wavyappbar(),
           Expanded(
             child: showThankYou
                 ? buildThankYouScreen()
@@ -58,7 +57,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     height: 8.0,
                     width: currentIndex == index ? 16.0 : 8.0,
                     decoration: BoxDecoration(
-                      color: currentIndex == index ? Colors.white : Colors.grey,
+                      color: currentIndex == index ? secondary : Colors.grey,
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   );
@@ -69,7 +68,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             clipper: WaveClipperTwo(reverse: true),
             child: Container(
               height: 100,
-              color: Colors.white,
+              color: secondary,
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
@@ -82,13 +81,17 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         });
                       }
                     },
-                    backgroundColor: Color(0XFF5DC1C3),
-                    foregroundColor: Colors.white,
+                    backgroundColor: primary,
+                    foregroundColor: secondary,
                     shape: const CircleBorder(),
-                    child: const Icon(
-                      Icons.arrow_back,
-                      size: 40,
-                    ),
+                    child: IconButton(
+                      icon: Image.asset(
+                        "assets/backArrow.png",
+                        width: 40,
+                        height: 40,
+                      ),
+                      onPressed: () {Navigator.pop(context);},
+                    )
                   ),
                 ),
               ),
@@ -101,7 +104,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   Widget buildFirstScreen() {
     return Container(
-      color: Color(0XFF5DC1C3),
+      color: primary,
       child: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -110,13 +113,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Create Your Account',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: secondary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -128,7 +131,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -140,7 +143,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -153,7 +156,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -166,14 +169,14 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: switchContent,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: secondary,
                     foregroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -195,7 +198,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   Widget buildSecondScreen() {
     return Container(
-      color: Color(0XFF5DC1C3),
+      color: primary,
       child: Center(
         child: SingleChildScrollView(
           child: Padding(
@@ -204,13 +207,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Create Your Account',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: secondary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -222,23 +225,23 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                     Text(
                       'Gender',
-                      style: TextStyle(color: Colors.white, fontSize: 16),
+                      style: TextStyle(color:secondary, fontSize: 16),
                     ),
                     Row(
                       children: [
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: secondary,
                             foregroundColor: Colors.teal,
                             shape: const CircleBorder(),
                           ),
@@ -248,7 +251,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         ElevatedButton(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
+                            backgroundColor: secondary,
                             foregroundColor: Colors.teal,
                             shape: const CircleBorder(),
                           ),
@@ -267,7 +270,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -279,7 +282,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -288,7 +291,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     showThankYouScreen();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: secondary,
                     foregroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
@@ -310,31 +313,31 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
 
   Widget buildThankYouScreen() {
     return Container(
-      color: Color(0XFF5DC1C3),
+      color: primary,
       child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.check_circle,
-              color: Colors.white,
+              color: secondary,
               size: 100,
             ),
             const SizedBox(height: 20),
-            const Text(
+             Text(
               'Thank You!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: secondary,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
+             Text(
               'Your account has been successfully created.',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.white70,
+                color: secondary,
               ),
               textAlign: TextAlign.center,
             ),
