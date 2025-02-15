@@ -3,10 +3,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/bottomBar.dart';
 import 'package:grad_project/core/widgets/wavyAppBar.dart';
+import 'package:grad_project/pages/create_account_doctor.dart';
 import 'package:grad_project/pages/create_account_patient.dart';
 
-class DoctorPation extends StatelessWidget {
-  const DoctorPation({super.key});
+class DoctorPatient extends StatelessWidget {
+  const DoctorPatient({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,7 @@ class DoctorPation extends StatelessWidget {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.4,
               child: ElevatedButton(
-                onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => CreateAccountScreen()));},
+                onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => CreateAccountScreenPatient()));},
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),
@@ -120,7 +121,7 @@ class DoctorPation extends StatelessWidget {
             child: SizedBox(
               width: MediaQuery.of(context).size.width * 0.4,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {Navigator.push(context,MaterialPageRoute(builder: (context) => CreateAccountScreenDoctor()));},
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(18),

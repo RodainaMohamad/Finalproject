@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/wavyAppBar.dart';
 import 'package:grad_project/pages/SignIn.dart';
@@ -19,9 +20,9 @@ class Splashscreen extends StatelessWidget {
           const Stack(children: [
             Wavyappbar(),
           ]),
-          const SizedBox(height: 75),
+          const SizedBox(height:12.5),
           Center(
-            child: logo,
+            child: nabd,
           ),
           const SizedBox(height: 5),
           GestureDetector(

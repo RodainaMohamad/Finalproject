@@ -1,26 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
+import 'package:grad_project/core/widgets/SecondPatientScreen.dart';
+import 'package:grad_project/core/widgets/first_screen.dart';
+import 'package:grad_project/core/widgets/second_screen.dart';
+import 'package:grad_project/core/widgets/thank_you.dart';
 import 'package:grad_project/core/widgets/wavyAppBar.dart';
+import 'package:intl/intl.dart';
 
-class CreateAccountScreen extends StatefulWidget {
-
-  static const String routeName = 'CreateAccountScreen';
+class CreateAccountScreenPatient extends StatefulWidget {
+  static const String routeName = 'CreateAccountScreenPatient';
 
   @override
   _CreateAccountScreenState createState() => _CreateAccountScreenState();
 }
 
-class _CreateAccountScreenState extends State<CreateAccountScreen> {
+class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
   int currentIndex = 0;
   bool showThankYou = false;
 
-  void switchContent() {
+  void navigateToSecondPatientScreen() {
     setState(() {
       currentIndex = 1;
     });
   }
-
   void showThankYouScreen() {
     setState(() {
       showThankYou = true;
@@ -30,20 +33,25 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:primary,
+      backgroundColor: const Color(0XFF5DC1C3),
       body: Column(
         children: [
-          Wavyappbar(),
+          ClipPath(
+            clipper: WaveClipperOne(flip: true),
+            child: Container(
+              height: 120,
+              color: Colors.white,
+            ),),
           Expanded(
             child: showThankYou
-                ? buildThankYouScreen()
+                ? const ThankYou()
                 : IndexedStack(
-                    index: currentIndex,
-                    children: [
-                      buildFirstScreen(),
-                      buildSecondScreen(),
-                    ],
-                  ),
+              index: currentIndex,
+              children: [
+                FirstScreen(onContinue: navigateToSecondPatientScreen),
+                SecondPatientScreen(onDone: showThankYouScreen),
+              ],
+            ),
           ),
           if (!showThankYou)
             Padding(
@@ -57,7 +65,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                     height: 8.0,
                     width: currentIndex == index ? 16.0 : 8.0,
                     decoration: BoxDecoration(
-                      color: currentIndex == index ? secondary : Colors.grey,
+                      color: currentIndex == index ? Colors.white : Colors.grey,
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                   );
@@ -68,7 +76,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
             clipper: WaveClipperTwo(reverse: true),
             child: Container(
               height: 100,
-              color: secondary,
+              color: Colors.white,
               child: Align(
                 alignment: Alignment.bottomLeft,
                 child: Padding(
@@ -81,268 +89,19 @@ class _CreateAccountScreenState extends State<CreateAccountScreen> {
                         });
                       }
                     },
-                    backgroundColor: primary,
-                    foregroundColor: secondary,
+                    backgroundColor: Color(0XFF5DC1C3),
+                    foregroundColor: Colors.white,
                     shape: const CircleBorder(),
-                    child: IconButton(
-                      icon: Image.asset(
-                        "assets/backArrow.png",
-                        width: 40,
-                        height: 40,
-                      ),
-                      onPressed: () {Navigator.pop(context);},
-                    )
+                    child: const Icon(
+                      Icons.arrow_back,
+                      size: 40,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          )
         ],
-      ),
-    );
-  }
-
-  Widget buildFirstScreen() {
-    return Container(
-      color: primary,
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Create Your Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: secondary,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'G-mail , Phone number',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'User name',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Re-type Password',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: switchContent,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    foregroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildSecondScreen() {
-    return Container(
-      color: primary,
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'Create Your Account',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: secondary,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                     Text(
-                      'Gender',
-                      style: TextStyle(color:secondary, fontSize: 16),
-                    ),
-                    Row(
-                      children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: secondary,
-                            foregroundColor: Colors.teal,
-                            shape: const CircleBorder(),
-                          ),
-                          child: const Text('M'),
-                        ),
-                        const SizedBox(width: 10),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: secondary,
-                            foregroundColor: Colors.teal,
-                            shape: const CircleBorder(),
-                          ),
-                          child: const Text('F'),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'National ID',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                TextFormField(
-                  decoration: InputDecoration(
-                    labelText: 'Guardian Number',
-                    labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    filled: true,
-                    fillColor: secondary,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () {
-                    showThankYouScreen();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: secondary,
-                    foregroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
-                  ),
-                  child: const Text(
-                    'Done',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildThankYouScreen() {
-    return Container(
-      color: primary,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.check_circle,
-              color: secondary,
-              size: 100,
-            ),
-            const SizedBox(height: 20),
-             Text(
-              'Thank You!',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-                color: secondary,
-              ),
-            ),
-            const SizedBox(height: 10),
-             Text(
-              'Your account has been successfully created.',
-              style: TextStyle(
-                fontSize: 18,
-                color: secondary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
       ),
     );
   }

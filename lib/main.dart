@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/pages/DoctorPatient.dart';
+import 'package:grad_project/pages/PatientHome.dart';
 import 'package:grad_project/pages/SignIn.dart';
 import 'package:grad_project/pages/SplashScreen.dart';
+import 'package:grad_project/pages/create_account_doctor.dart';
 import 'package:grad_project/pages/create_account_patient.dart';
-import 'package:grad_project/pages/whoRU.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,10 +19,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: "Splashscreen",
       routes: {
-        'Splashscreen': (context) => Splashscreen(),
-        'CreateAccountScreen': (context) => CreateAccountScreen(),
-        'Signin': (context) => Signin(),
-        'DoctorPation': (context) => DoctorPation(),
+        'Splashscreen': (context) => const Splashscreen(),
+        'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
+        'Signin': (context) => const Signin(),
+        'DoctorPatient': (context) =>const DoctorPatient(),
+        'PatientHome': (context) => const Patienthome(),
+        'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
       },
     );
   }
