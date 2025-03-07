@@ -23,7 +23,6 @@ class _Signin extends State<Signin> {
   var password = TextEditingController();
   GlobalKey<FormState> keyLogin = GlobalKey();
   bool flag = false;
-
   Color yesBorderColor = secondary;
   Color noBorderColor = secondary;
 
@@ -195,7 +194,7 @@ class _Signin extends State<Signin> {
                                   if (keyLogin.currentState!.validate()) {
                                     Navigator.push(
                                       context,
-                                      MaterialPageRoute(builder: (context) => Patienthome()),
+                                      MaterialPageRoute(builder: (context) => const Patienthome()),
                                     );
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -212,7 +211,7 @@ class _Signin extends State<Signin> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: secondary,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                                     side: BorderSide(width: 2, color: yesBorderColor),
                                   ),
                                 ),
@@ -234,13 +233,13 @@ class _Signin extends State<Signin> {
                               child: ElevatedButton(
                                 onPressed: () {
                                   Navigator.push(context,
-                                    MaterialPageRoute(builder: (context) => DoctorPatient()),
+                                    MaterialPageRoute(builder: (context) => const DoctorPatient()),
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: secondary,
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                    borderRadius: const BorderRadius.all(Radius.circular(10)),
                                     side: BorderSide(width: 2, color: yesBorderColor),
                                   ),
                                 ),

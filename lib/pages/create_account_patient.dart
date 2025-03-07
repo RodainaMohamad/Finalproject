@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
-import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/SecondPatientScreen.dart';
 import 'package:grad_project/core/widgets/first_screen.dart';
-import 'package:grad_project/core/widgets/second_screen.dart';
 import 'package:grad_project/core/widgets/thank_you.dart';
-import 'package:grad_project/core/widgets/wavyAppBar.dart';
-import 'package:intl/intl.dart';
 
 class CreateAccountScreenPatient extends StatefulWidget {
   static const String routeName = 'CreateAccountScreenPatient';
@@ -18,12 +14,21 @@ class CreateAccountScreenPatient extends StatefulWidget {
 class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
   int currentIndex = 0;
   bool showThankYou = false;
+  String? email;
+  String? fullName;
+  String? password;
+  String? confirmPassword;
 
-  void navigateToSecondPatientScreen() {
+  void navigateToSecondPatientScreen(String email, String fullName, String password, String confirmPassword) {
     setState(() {
+      this.email = email;
+      this.fullName = fullName;
+      this.password = password;
+      this.confirmPassword = confirmPassword;
       currentIndex = 1;
     });
   }
+
   void showThankYouScreen() {
     setState(() {
       showThankYou = true;
@@ -41,7 +46,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
             child: Container(
               height: 120,
               color: Colors.white,
-            ),),
+            ),
+          ),
           Expanded(
             child: showThankYou
                 ? const ThankYou()
@@ -49,7 +55,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
               index: currentIndex,
               children: [
                 FirstScreen(onContinue: navigateToSecondPatientScreen),
-                SecondPatientScreen(onDone: showThankYouScreen),
+                SecondScreen(
+                  onDone: showThankYouScreen,
+                  email: email ?? '',
+                  fullName: fullName ?? '',
+                  password: password ?? '',
+                  confirmPassword: confirmPassword ?? '',
+                ),
               ],
             ),
           ),
@@ -89,7 +101,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
                         });
                       }
                     },
-                    backgroundColor: Color(0XFF5DC1C3),
+                    backgroundColor: const Color(0XFF5DC1C3),
                     foregroundColor: Colors.white,
                     shape: const CircleBorder(),
                     child: const Icon(
@@ -100,7 +112,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

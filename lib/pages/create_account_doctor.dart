@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:grad_project/core/widgets/SecondDoctorScreen.dart';
 import 'package:grad_project/core/widgets/first_screen.dart';
-import 'package:grad_project/core/widgets/second_screen.dart';
 import 'package:grad_project/core/widgets/thank_you.dart';
 
 class CreateAccountScreenDoctor extends StatefulWidget {
@@ -14,12 +14,21 @@ class CreateAccountScreenDoctor extends StatefulWidget {
 class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
   int currentIndex = 0;
   bool showThankYou = false;
+  String? email;
+  String? fullName;
+  String? password;
+  String? confirmPassword;
 
-  void navigateToSecondScreen() {
+  void navigateToSecondScreen(String email, String fullName, String password, String confirmPassword) {
     setState(() {
+      this.email = email;
+      this.fullName = fullName;
+      this.password = password;
+      this.confirmPassword = confirmPassword;
       currentIndex = 1;
     });
   }
+
   void showThankYouScreen() {
     setState(() {
       showThankYou = true;
@@ -37,7 +46,8 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
             child: Container(
               height: 120,
               color: Colors.white,
-            ),),
+            ),
+          ),
           Expanded(
             child: showThankYou
                 ? const ThankYou()
@@ -45,7 +55,13 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
               index: currentIndex,
               children: [
                 FirstScreen(onContinue: navigateToSecondScreen),
-                SecondScreen(onDone: showThankYouScreen),
+                SecondDoctorScreen(
+                  onDone: showThankYouScreen,
+                  email: email ?? '',
+                  fullName: fullName ?? '',
+                  password: password ?? '',
+                  confirmPassword: confirmPassword ?? '',
+                ),
               ],
             ),
           ),
@@ -85,7 +101,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
                         });
                       }
                     },
-                    backgroundColor: Color(0XFF5DC1C3),
+                    backgroundColor: const Color(0XFF5DC1C3),
                     foregroundColor: Colors.white,
                     shape: const CircleBorder(),
                     child: const Icon(
@@ -96,7 +112,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
