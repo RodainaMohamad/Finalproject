@@ -6,7 +6,16 @@ class ThankYou extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0XFF5DC1C3),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF22E0E4),
+            Color(0xFF2C5C5D),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
       child: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
