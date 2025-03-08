@@ -56,11 +56,11 @@ class _Signin extends State<Signin> {
             padding: const EdgeInsets.all(0),
             child: Column(
               children: [
-                const Stack(
-                  children: [
-                    Wavyappbar(),
-                  ],
-                ),
+                
+                  
+         
+                  
+                
                 const SizedBox(height: 25),
                 Center(
                   child: Column(
