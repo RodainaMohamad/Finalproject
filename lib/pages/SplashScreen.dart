@@ -11,6 +11,8 @@ class Splashscreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -25,11 +27,11 @@ class Splashscreen extends StatelessWidget {
         ),
         child: Column(
           children: [
-            const SizedBox(height: 12.5),
+            SizedBox(height: screenHeight * 0.13),
             Center(
               child: nabd,
             ),
-            const SizedBox(height: 5),
+            SizedBox(height: screenHeight * 0.037),
             GestureDetector(
               child: arrow,
               onTap: () {
