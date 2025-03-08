@@ -15,7 +15,8 @@ class _FirstScreenState extends State<FirstScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
 
   void switchContent() {
     if (_formKeyFirstScreen.currentState!.validate()) {
@@ -33,7 +34,16 @@ class _FirstScreenState extends State<FirstScreen> {
     return Form(
       key: _formKeyFirstScreen,
       child: Container(
-        color: const Color(0XFF5DC1C3),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF22E0E4),
+              Color(0xFF2C5C5D),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
@@ -66,7 +76,8 @@ class _FirstScreenState extends State<FirstScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email or phone number';
                     }
-                    if (!RegExp(r'^[\w-.]+@([\w-]+.)+[\w-]{2,4}$').hasMatch(value) &&
+                    if (!RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$')
+                            .hasMatch(value) &&
                         !RegExp(r'^[0-9]{11}$').hasMatch(value)) {
                       return 'Please enter a valid email or phone number';
                     }

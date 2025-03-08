@@ -49,164 +49,7 @@
 //                     ),
 //                   ),
 //                   const SizedBox(height: 20),
-//                   TextFormField(
-//                     controller: nameController,
-//                     decoration: InputDecoration(
-//                       labelText: 'Name',
-//                       labelStyle: const TextStyle(color: Colors.teal),
-//                       border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.white,
-//                     ),
-//                     validator: (value) {
-//                       if (value == null || value.isEmpty) {
-//                         return 'Please enter the name';
-//                       }
-//                       final regex = RegExp(r'^[\u0600-\u06FFa-zA-Z\s]+$');
-//                       if (!regex.hasMatch(value)) {
-//                         return 'Please enter letters Arabic and English';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                   const SizedBox(height: 10),
-//                   TextFormField(
-//                     controller: birthDateController,
-//                     decoration: InputDecoration(
-//                       labelText: 'Birth Date',
-//                       labelStyle: const TextStyle(color: Colors.teal),
-//                       border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.white,
-//                     ),
-//                     onTap: () async {
-//                       DateTime data = DateTime(1900);
-//                       FocusScope.of(context).requestFocus(FocusNode());
-//                       data = (await showDatePicker(
-//                         context: context,
-//                         initialDate: DateTime.now(),
-//                         firstDate: DateTime(1900),
-//                         lastDate: DateTime(2100),
-//                       ))!;
-//                       String dateFormatter = data.toIso8601String();
-//                       DateTime dt = DateTime.parse(dateFormatter);
-//                       var formatter = DateFormat('dd-MMMM-yyyy');
-//                       birthDateController.text = formatter.format(dt);
-//                     },
-//                     validator: (value) {
-//                       if (value == null || value.isEmpty) {
-//                         return 'Please select your birthdate';
-//                       }
-//                       DateTime birthDate = DateFormat('dd-MMMM-yyyy').parse(value);
-//                       int age = DateTime.now().year - birthDate.year;
-//                       if (DateTime.now().month < birthDate.month ||
-//                           (DateTime.now().month == birthDate.month &&
-//                               DateTime.now().day < birthDate.day)) {
-//                         age--;
-//                       }
-//                       if (age < 18) {
-//                         return 'Age must be greater than 18';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                   const SizedBox(height: 10),
-//                   Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       const Text(
-//                         'Gender',
-//                         style: TextStyle(color: Colors.white, fontSize: 16),
-//                       ),
-//                       Row(
-//                         children: [
-//                           ElevatedButton(
-//                             onPressed: () {},
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: Colors.white,
-//                               foregroundColor: Colors.teal,
-//                               shape: const CircleBorder(),
-//                             ),
-//                             child: const Text('M'),
-//                           ),
-//                           const SizedBox(width: 10),
-//                           ElevatedButton(
-//                             onPressed: () {},
-//                             style: ElevatedButton.styleFrom(
-//                               backgroundColor: Colors.white,
-//                               foregroundColor: Colors.teal,
-//                               shape: const CircleBorder(),
-//                             ),
-//                             child: const Text('F'),
-//                           ),
-//                         ],
-//                       ),
-//                     ],
-//                   ),
-//                   const SizedBox(height: 10),
-//                   TextFormField(
-//                     controller: nationalidController,
-//                     decoration: InputDecoration(
-//                       labelText: 'National ID',
-//                       labelStyle: const TextStyle(color: Colors.teal),
-//                       border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.white,
-//                     ),
-//                     validator: (value) {
-//                       if (value == null || value.isEmpty) {
-//                         return 'Please enter your National ID';
-//                       }
-//                       if (value.length != 14) {
-//                         return 'National ID must be 14 digits';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                   const SizedBox(height: 10),
-//                   TextFormField(
-//                     controller: phoneNumberController,
-//                     decoration: InputDecoration(
-//                       labelText: 'Phone Number',
-//                       labelStyle: const TextStyle(color: Colors.teal),
-//                       border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.circular(10),
-//                       ),
-//                       filled: true,
-//                       fillColor: Colors.white,
-//                     ),
-//                     validator: (value) {
-//                       if (value == null || value.isEmpty) {
-//                         return 'Please enter the phone number';
-//                       }
-//                       if (value.length != 11) {
-//                         return 'The phone number must contain 11 digits';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                   const SizedBox(height: 20),
-//                   ElevatedButton(
-//                     onPressed: showThankYouScreen,
-//                     style: ElevatedButton.styleFrom(
-//                       backgroundColor: Colors.white,
-//                       foregroundColor: Colors.teal,
-//                       shape: RoundedRectangleBorder(
-//                         borderRadius: BorderRadius.circular(20),
-//                       ),
-//                       padding: const EdgeInsets.symmetric(vertical: 15),
-//                     ),
-//                     child: const Text(
-//                       'Done',
-//                       style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                     ),
-//                   ),
+//                   // ... other form fields ...
 //                 ],
 //               ),
 //             ),
@@ -216,6 +59,7 @@
 //     );
 //   }
 // }
+
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
@@ -243,10 +87,12 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   final _formKeySecondScreen = GlobalKey<FormState>();
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
   final TextEditingController nationalIdController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
+
   String? selectedGender;
 
   final RegisterService _registerService = RegisterService();
@@ -255,7 +101,9 @@ class _SecondScreenState extends State<SecondScreen> {
     if (_formKeySecondScreen.currentState!.validate()) {
       try {
         RegisterModel response = await _registerService.register(
-          fullName: nameController.text.isNotEmpty ? nameController.text : widget.fullName,
+          fullName: nameController.text.isNotEmpty
+              ? nameController.text
+              : widget.fullName,
           email: widget.email,
           gender: selectedGender ?? 'M',
           dateOfBirth: birthDateController.text,
@@ -265,6 +113,7 @@ class _SecondScreenState extends State<SecondScreen> {
           password: widget.password,
           confirmPassword: widget.confirmPassword,
         );
+
         widget.onDone();
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -279,7 +128,16 @@ class _SecondScreenState extends State<SecondScreen> {
     return Form(
       key: _formKeySecondScreen,
       child: Container(
-        color: const Color(0XFF5DC1C3),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF22E0E4),
+              Color(0xFF2C5C5D),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20.0),
@@ -297,12 +155,14 @@ class _SecondScreenState extends State<SecondScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
+
                 TextFormField(
                   controller: nameController,
                   decoration: InputDecoration(
                     labelText: 'Name',
                     labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -314,12 +174,14 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+
                 TextFormField(
                   controller: birthDateController,
                   decoration: InputDecoration(
                     labelText: 'Birth Date',
                     labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -331,7 +193,8 @@ class _SecondScreenState extends State<SecondScreen> {
                       lastDate: DateTime(2100),
                     );
                     if (data != null) {
-                      var formatter = DateFormat('yyyy-MM-dd'); // Use ISO 8601 date format
+                      var formatter =
+                          DateFormat('yyyy-MM-dd'); // Use ISO 8601 format.
                       birthDateController.text = formatter.format(data);
                     }
                   },
@@ -340,7 +203,7 @@ class _SecondScreenState extends State<SecondScreen> {
                       return 'Please select your birthdate';
                     }
                     try {
-                      DateTime.parse(value); // Validate the date format
+                      DateTime.parse(value); // Validate date format.
                     } catch (e) {
                       return 'Invalid date format';
                     }
@@ -348,27 +211,38 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Gender', style: TextStyle(color: Colors.white, fontSize: 16)),
+                    const Text('Gender',
+                        style: TextStyle(color: Colors.white, fontSize: 16)),
                     Row(
                       children: [
                         ElevatedButton(
                           onPressed: () => setState(() => selectedGender = 'M'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedGender == 'M' ? Colors.teal : Colors.white,
-                            foregroundColor: selectedGender == 'M' ? Colors.white : Colors.teal,
+                            backgroundColor: selectedGender == 'M'
+                                ? Colors.teal
+                                : Colors.white,
+                            foregroundColor: selectedGender == 'M'
+                                ? Colors.white
+                                : Colors.teal,
                             shape: const CircleBorder(),
                           ),
                           child: const Text('M'),
                         ),
                         const SizedBox(width: 10),
+                        // Button for selecting Female.
                         ElevatedButton(
                           onPressed: () => setState(() => selectedGender = 'F'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: selectedGender == 'F' ? Colors.teal : Colors.white,
-                            foregroundColor: selectedGender == 'F' ? Colors.white : Colors.teal,
+                            backgroundColor: selectedGender == 'F'
+                                ? Colors.teal
+                                : Colors.white,
+                            foregroundColor: selectedGender == 'F'
+                                ? Colors.white
+                                : Colors.teal,
                             shape: const CircleBorder(),
                           ),
                           child: const Text('F'),
@@ -378,12 +252,14 @@ class _SecondScreenState extends State<SecondScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
+                // Text field for National ID.
                 TextFormField(
                   controller: nationalIdController,
                   decoration: InputDecoration(
                     labelText: 'National ID',
                     labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -395,12 +271,14 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+                // Text field for Phone Number.
                 TextFormField(
                   controller: phoneNumberController,
                   decoration: InputDecoration(
                     labelText: 'Phone Number',
                     labelStyle: const TextStyle(color: Colors.teal),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10)),
                     filled: true,
                     fillColor: Colors.white,
                   ),
@@ -412,12 +290,14 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
+                // Button to submit the form.
                 ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.teal,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
                     padding: const EdgeInsets.symmetric(vertical: 15),
                   ),
                   child: const Text(

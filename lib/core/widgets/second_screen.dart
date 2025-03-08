@@ -30,7 +30,16 @@ class _SecondScreenState extends State<SecondScreen> {
     return Form(
       key: _formKeySecondScreen,
       child: Container(
-        color: const Color(0XFF5DC1C3),
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              Color(0xFF22E0E4),
+              Color(0xFF2C5C5D),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
@@ -101,7 +110,8 @@ class _SecondScreenState extends State<SecondScreen> {
                       if (value == null || value.isEmpty) {
                         return 'Please select your birthdate';
                       }
-                      DateTime birthDate = DateFormat('dd-MMMM-yyyy').parse(value);
+                      DateTime birthDate =
+                          DateFormat('dd-MMMM-yyyy').parse(value);
                       int age = DateTime.now().year - birthDate.year;
                       if (DateTime.now().month < birthDate.month ||
                           (DateTime.now().month == birthDate.month &&
@@ -227,7 +237,8 @@ class _SecondScreenState extends State<SecondScreen> {
                     ),
                     child: const Text(
                       'Done',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
