@@ -72,20 +72,6 @@ class StatusCard extends StatelessWidget {
                   ),
                 ],
               ),
-              // Text(
-              //   "Normal Range",
-              //   style: GoogleFonts.nunito(
-              //     fontSize: 10,
-              //     color: secondary.withOpacity(0.6),
-              //   ),
-              // ),
-              // Text(
-              //   normalRange,
-              //   style: GoogleFonts.nunito(
-              //     fontSize: 10,
-              //     color: secondary.withOpacity(0.6),
-              //   ),
-              // ),
             ],
           ),
         ),

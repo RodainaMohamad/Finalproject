@@ -15,11 +15,11 @@ class Splashscreen extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF22E0E4),
-              Color(0xFF2C5C5D),
+              gradient1,
+              gradient2,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -31,7 +31,7 @@ class Splashscreen extends StatelessWidget {
             Center(
               child: nabd,
             ),
-            SizedBox(height: screenHeight * 0.037),
+            SizedBox(height: screenHeight * 0.051),
             GestureDetector(
               child: arrow,
               onTap: () {

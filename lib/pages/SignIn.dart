@@ -43,11 +43,11 @@ class _Signin extends State<Signin> {
       resizeToAvoidBottomInset: true,
       body: Container(
         height: MediaQuery.of(context).size.height,
-        decoration: const BoxDecoration(
+        decoration:  BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF22E0E4),
-              Color(0xFF2C5C5D),
+              gradient1,
+              gradient2,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,

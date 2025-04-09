@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:intl/intl.dart';
 
 class SecondDoctorScreen extends StatefulWidget {
@@ -102,13 +103,13 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Create Your Account (Doctor)',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                      color: secondary),
                 ),
                 const SizedBox(height: 20),
                 TextFormField(
@@ -119,7 +120,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -137,7 +138,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   onTap: () async {
                     DateTime? data = await showDatePicker(
@@ -167,8 +168,8 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Gender',
-                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                    Text('Gender',
+                        style: TextStyle(color: secondary, fontSize: 16)),
                     Row(
                       children: [
                         ElevatedButton(
@@ -176,9 +177,9 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: selectedGender == 'M'
                                 ? Colors.teal
-                                : Colors.white,
+                                : secondary,
                             foregroundColor: selectedGender == 'M'
-                                ? Colors.white
+                                ? secondary
                                 : Colors.teal,
                             shape: const CircleBorder(),
                           ),
@@ -190,9 +191,9 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: selectedGender == 'F'
                                 ? Colors.teal
-                                : Colors.white,
+                                : secondary,
                             foregroundColor: selectedGender == 'F'
-                                ? Colors.white
+                                ? secondary
                                 : Colors.teal,
                             shape: const CircleBorder(),
                           ),
@@ -211,7 +212,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -229,7 +230,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -247,7 +248,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10)),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -260,7 +261,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
                 ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: secondary,
                     foregroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),

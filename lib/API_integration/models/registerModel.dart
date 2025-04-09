@@ -48,6 +48,6 @@ class RegisterModel {
     if (specialty != null) data['specialty'] = specialty;
     if (password != null) data['password'] = password;
     if (confirmPassword != null) data['confirmPassword'] = confirmPassword;
-    return data; // Flat JSON object without 'model' wrapper
+    return data;
   }
 }

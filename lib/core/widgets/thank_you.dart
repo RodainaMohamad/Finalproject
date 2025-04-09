@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 
 class ThankYou extends StatelessWidget {
   const ThankYou({super.key});
@@ -6,40 +7,40 @@ class ThankYou extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF22E0E4),
-            Color(0xFF2C5C5D),
+            gradient1,
+            gradient2,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
       ),
-      child: const Center(
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.check_circle,
-              color: Colors.white,
+              color: secondary,
               size: 100,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Text(
               'Thank You!',
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: secondary,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               'Your account has been successfully created.',
               style: TextStyle(
                 fontSize: 18,
-                color: Colors.white70,
+                color: secondary,
               ),
               textAlign: TextAlign.center,
             ),

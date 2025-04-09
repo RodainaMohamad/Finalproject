@@ -20,3 +20,4 @@ var topRightCorner=Image.asset(
 
 String content="Neu  Heart hear stress Palpitat\n."
     " It is recommended to jyjtyjt  but jgk tyjtdfx perform an ECG and thyroid function tests to confirm the diagnosis and rule out organic causes.";
+

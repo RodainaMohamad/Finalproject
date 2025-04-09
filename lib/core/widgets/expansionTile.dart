@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 
 class CustomExpansionTile extends StatelessWidget {
   final String title;
@@ -20,14 +21,14 @@ class CustomExpansionTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         child: ExpansionTile(
-          collapsedIconColor: Colors.white,
-          iconColor: Colors.white,
+          collapsedIconColor: secondary,
+          iconColor: secondary,
           title: Text(
             title,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: secondary,
             ),
           ),
           children: [
@@ -37,7 +38,7 @@ class CustomExpansionTile extends StatelessWidget {
                 content,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white70,
+                  color: secondary,
                 ),
               ),
             ),

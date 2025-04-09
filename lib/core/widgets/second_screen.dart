@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:intl/intl.dart';
 
 class SecondScreen extends StatefulWidget {
@@ -30,11 +31,11 @@ class _SecondScreenState extends State<SecondScreen> {
     return Form(
       key: _formKeySecondScreen,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF22E0E4),
-              Color(0xFF2C5C5D),
+              gradient1,
+              gradient2,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -48,13 +49,13 @@ class _SecondScreenState extends State<SecondScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  Text(
                     'Create Your Account',
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: secondary,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -67,7 +68,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: secondary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -90,7 +91,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: secondary,
                     ),
                     onTap: () async {
                       DateTime data = DateTime(1900);
@@ -128,16 +129,16 @@ class _SecondScreenState extends State<SecondScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'Gender',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
+                        style: TextStyle(color: secondary, fontSize: 16),
                       ),
                       Row(
                         children: [
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
+                              backgroundColor: secondary,
                               foregroundColor: Colors.teal,
                               shape: const CircleBorder(),
                             ),
@@ -147,7 +148,7 @@ class _SecondScreenState extends State<SecondScreen> {
                           ElevatedButton(
                             onPressed: () {},
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
+                              backgroundColor: secondary,
                               foregroundColor: Colors.teal,
                               shape: const CircleBorder(),
                             ),
@@ -167,7 +168,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: secondary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -189,7 +190,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: secondary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -211,7 +212,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: secondary,
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
@@ -228,7 +229,7 @@ class _SecondScreenState extends State<SecondScreen> {
                   ElevatedButton(
                     onPressed: showThankYouScreen,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
+                      backgroundColor: secondary,
                       foregroundColor: Colors.teal,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 
 class FirstScreen extends StatefulWidget {
   final Function(String, String, String, String) onContinue;
@@ -34,11 +35,11 @@ class _FirstScreenState extends State<FirstScreen> {
     return Form(
       key: _formKeyFirstScreen,
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF22E0E4),
-              Color(0xFF2C5C5D),
+              gradient1,
+              gradient2,
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -51,13 +52,13 @@ class _FirstScreenState extends State<FirstScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'Create Your Account',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white,
+                    color: secondary,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -70,7 +71,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -94,7 +95,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor:secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -124,7 +125,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -157,7 +158,7 @@ class _FirstScreenState extends State<FirstScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     filled: true,
-                    fillColor: Colors.white,
+                    fillColor: secondary,
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -173,7 +174,7 @@ class _FirstScreenState extends State<FirstScreen> {
                 ElevatedButton(
                   onPressed: switchContent,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
+                    backgroundColor: secondary,
                     foregroundColor: Colors.teal,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),

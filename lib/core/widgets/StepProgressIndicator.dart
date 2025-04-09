@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gradproject/core/constants/colours/colours.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:step_progress_indicator/step_progress_indicator.dart';
 
 class Stepprogressindicator extends StatelessWidget {
