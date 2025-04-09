@@ -35,7 +35,6 @@ class RegisterModel {
     password = json['password'];
     confirmPassword = json['confirmPassword'];
   }
-
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (fullName != null) data['fullName'] = fullName;

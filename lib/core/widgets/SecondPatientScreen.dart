@@ -1,65 +1,3 @@
-// import 'package:flutter/material.dart';
-// import 'package:intl/intl.dart';
-//
-// class SecondPatientScreen extends StatefulWidget {
-//   final VoidCallback onDone;
-//
-//   const SecondPatientScreen({super.key, required this.onDone});
-//
-//   @override
-//   State<SecondPatientScreen> createState() => _SecondScreenState();
-// }
-//
-// class _SecondScreenState extends State<SecondPatientScreen> {
-//   bool _isObscure = true;
-//   final _formKeySecondScreen = GlobalKey<FormState>();
-//   final TextEditingController nameController = TextEditingController();
-//   final TextEditingController birthDateController = TextEditingController();
-//   final TextEditingController nationalidController = TextEditingController();
-//   final TextEditingController phoneNumberController = TextEditingController();
-//   final TextEditingController specialistcontroller = TextEditingController();
-//
-//   void showThankYouScreen() {
-//     if (_formKeySecondScreen.currentState!.validate()) {
-//       widget.onDone(); // Call the callback function
-//     }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Form(
-//       key: _formKeySecondScreen,
-//       child: Container(
-//         color: const Color(0XFF5DC1C3),
-//         child: Center(
-//           child: SingleChildScrollView(
-//             child: Padding(
-//               padding: const EdgeInsets.all(20.0),
-//               child: Column(
-//                 mainAxisAlignment: MainAxisAlignment.center,
-//                 crossAxisAlignment: CrossAxisAlignment.stretch,
-//                 children: [
-//                   const Text(
-//                     'Create Your Account',
-//                     textAlign: TextAlign.center,
-//                     style: TextStyle(
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.bold,
-//                       color: secondary,
-//                     ),
-//                   ),
-//                   const SizedBox(height: 20),
-//                   // ... other form fields ...
-//                 ],
-//               ),
-//             ),
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
@@ -147,7 +85,7 @@ class _SecondScreenState extends State<SecondScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Create Your Account (Doctor)',
+                  'Create Your Account (Patient)',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 24,
