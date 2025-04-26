@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/HomeBottomBar.dart';
 import 'package:grad_project/core/widgets/expansionTile.dart';
 import 'package:grad_project/core/widgets/statusCards.dart';
+import 'package:grad_project/cubits/HeartRate_events.dart';
+import 'package:grad_project/cubits/HeartRate_states.dart';
+import 'package:grad_project/cubits/MQTT__Temp_events.dart';
+import 'package:grad_project/cubits/MQTT__Temp_states.dart';
+import 'package:grad_project/cubits/OxygenRate_events.dart';
+import 'package:grad_project/cubits/OxygenRate_states.dart';
 
-class Patienthome extends StatelessWidget {
+class PatientHome extends StatelessWidget {
   static const String routeName = 'PatientHome';
-  const Patienthome({super.key});
+  const PatientHome({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +48,12 @@ class Patienthome extends StatelessWidget {
         ),
         child: Column(
           children: [
-            // Fixed part (logo, avatar, icons, status container)
             SizedBox(height: height * 0.062),
             Padding(
               padding: EdgeInsets.all(width * 0.01),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  //logo + divider
                   Row(
                     children: [
                       Expanded(
@@ -79,7 +84,6 @@ class Patienthome extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      // Text section (Welcome, Mohamed Ahmed)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -106,14 +110,12 @@ class Patienthome extends StatelessWidget {
                         ],
                       ),
                       SizedBox(width: width * 0.02),
-                      // CircleAvatar (center)
                       CircleAvatar(
                         radius: width * 0.07,
                         backgroundImage:
                         const AssetImage("assets/patientAvatar.png"),
                       ),
                       SizedBox(width: width * 0.1),
-                      // Icons section
                       Row(
                         children: List.generate(
                           icons.length,
@@ -227,7 +229,6 @@ class Patienthome extends StatelessWidget {
                 ],
               ),
             ),
-            // Scrollable part (StatusCards and ExpansionTiles)
             Expanded(
               child: SingleChildScrollView(
                 child: Column(
@@ -240,25 +241,37 @@ class Patienthome extends StatelessWidget {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
-                            StatusCard(
-                              image: Image.asset("assets/heartRate.png"),
-                              title: "Heart Rate",
-                              value: "88",
-                              unit: "bpm",
+                            BlocBuilder<HeartRateCubit, HeartRateState>(
+                              builder: (context, state) {
+                                return StatusCard(
+                                  image: Image.asset("assets/heartRate.png"),
+                                  title: "Heart Rate",
+                                  value: _getHeartRateValue(state),
+                                  unit: "bpm",
+                                );
+                              },
                             ),
                             SizedBox(width: width * 0.01),
-                            StatusCard(
-                              image: Image.asset("assets/temp.png"),
-                              title: "Temperature",
-                              value: "37.6",
-                              unit: "°C",
+                            BlocBuilder<TemperatureCubit, TemperatureState>(
+                              builder: (context, state) {
+                                return StatusCard(
+                                  image: Image.asset("assets/temp.png"),
+                                  title: "Temperature",
+                                  value: _getDisplayValue(state),
+                                  unit: "°C",
+                                );
+                              },
                             ),
                             SizedBox(width: width * 0.01),
-                            StatusCard(
-                              image: Image.asset("assets/pressure.png"),
-                              title: "Oxygen",
-                              value: "96",
-                              unit: "%",
+                            BlocBuilder<OxygenRateCubit, OxygenRateState>(
+                              builder: (context, state) {
+                                return StatusCard(
+                                  image: Image.asset("assets/pressure.png"),
+                                  title: "Oxygen",
+                                  value: _getOxygenValue(state),
+                                  unit: "%",
+                                );
+                              },
                             ),
                           ],
                         ),
@@ -268,11 +281,13 @@ class Patienthome extends StatelessWidget {
                     const CustomExpansionTile(
                       title: "My Diagnoses",
                       content:
-                      "Neu  Heart hear stress Palpitat\n.\"\" It is recommended to jyjtyjt  but jgk tyjtdfx perform an ECG and thyroid function tests to confirm the diagnosis and rule out organic causes.",
+                      "Neu Heart hear stress Palpitat\n.\"\" It is recommended to jyjtyjt  but jgk tyjtdfx perform an ECG and thyroid function tests to confirm the diagnosis and rule out organic causes.",
                     ),
                     SizedBox(height: height * 0.03),
                     const CustomExpansionTile(
-                        title: "My Medicine", content: "No this time."),
+                      title: "My Medicine",
+                      content: "No this time.",
+                    ),
                     SizedBox(height: height * 0.021),
                     BottomNavWidget(),
                   ],
@@ -283,5 +298,25 @@ class Patienthome extends StatelessWidget {
         ),
       ),
     );
+  }
+  String _getDisplayValue(TemperatureState state) {
+    if (!state.isConnected) return "Connecting";
+    if (state.error != null) return "Error";
+    if (state.temperature == null || state.temperature!.isEmpty) return "Waiting";
+    // Format to 1 decimal place
+    final temp = double.tryParse(state.temperature!) ?? 0;
+    return temp.toStringAsFixed(1);
+  }
+  String _getHeartRateValue(HeartRateState state) {
+    if (!state.isConnected) return "Connecting";
+    if (state.error != null) return "Error";
+    if (state.heartRate == null || state.heartRate!.isEmpty) return "--";
+    return state.heartRate!;
+  }
+  String _getOxygenValue(OxygenRateState state) {
+    if (!state.isConnected) return "Connecting";
+    if (state.error != null) return "Error";
+    if (state.oxygenRate == null || state.oxygenRate!.isEmpty) return "--";
+    return state.oxygenRate!;
   }
 }

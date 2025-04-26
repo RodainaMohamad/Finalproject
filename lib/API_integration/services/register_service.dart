@@ -23,16 +23,17 @@ class RegisterService {
         dateOfBirth: dateOfBirth,
         nationalId: nationalId,
         phoneNumber: phoneNumber,
-        userType: userType ?? 'Doctor',
+        userType: userType ?? 'Patient',
         specialty: specialty,
         password: password,
         confirmPassword: confirmPassword,
       );
       print('Request Body: ${jsonEncode(registerModel.toJson())}');
       final response = await Api().post(
-        url: "http://nabdapi.runasp.net/api/Accounts/register",
+        url: "http://nabdapi.runasp.net/register-user",
         body: registerModel.toJson(),
       );
+
       return RegisterModel.fromJson(response);
     } catch (e) {
       throw Exception("Failed to register: $e");

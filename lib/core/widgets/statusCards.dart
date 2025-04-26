@@ -39,6 +39,8 @@ class StatusCard extends StatelessWidget {
                 children: [
                   image,
                   SizedBox(width: width * 0.01),
+                  //title of card
+
                   Text(
                     title,
                     style: GoogleFonts.nunito(
@@ -53,14 +55,16 @@ class StatusCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    value,
-                    style: GoogleFonts.nunito(
-                      fontSize: 40,
-                      fontWeight: FontWeight.w700,
-                      color: secondary,
-                    ),
-                  ),
+                Text(
+                value,
+                style: GoogleFonts.nunito(
+                  fontSize: value.length > 5 ? 20 : 40, // Smaller font for longer text
+                  fontWeight: FontWeight.w700,
+                  color: secondary,
+                ),
+                overflow: TextOverflow.ellipsis, // Prevent overflow
+                maxLines: 1, // Restrict to one line
+                ),
                   SizedBox(width: width * 0.01),
                   Text(
                     unit,

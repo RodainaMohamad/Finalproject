@@ -51,10 +51,12 @@ class _SecondScreenState extends State<SecondScreen> {
           userType: 'patient',
           password: widget.password,
           confirmPassword: widget.confirmPassword,
+          specialty: ""
         );
 
         widget.onDone();
       } catch (e) {
+        debugPrint('Failed to register: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to register: $e')),
         );

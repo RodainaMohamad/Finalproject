@@ -74,6 +74,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
         );
         widget.onDone();
       } catch (e) {
+        debugPrint('Failed to register: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to register: $e')),
         );
