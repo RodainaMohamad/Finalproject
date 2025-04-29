@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
-class Doctorhome extends StatelessWidget {
-  const Doctorhome({super.key});
+class DoctorHome extends StatelessWidget {
+  const DoctorHome({super.key});
 
   @override
   Widget build(BuildContext context) {

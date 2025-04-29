@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        initialRoute: "Signin",
+        initialRoute: "PatientHome",
         routes: {
           'Splashscreen': (context) => const Splashscreen(),
           'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),

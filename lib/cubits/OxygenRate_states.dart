@@ -1,6 +1,6 @@
 class OxygenRateState {
   final bool isConnected;
-  final String? oxygenRate;
+  final double? oxygenRate;
   final String? error;
 
   OxygenRateState({
@@ -11,7 +11,7 @@ class OxygenRateState {
 
   OxygenRateState copyWith({
     bool? isConnected,
-    String? oxygenRate,
+    double? oxygenRate,
     String? error,
   }) {
     return OxygenRateState(

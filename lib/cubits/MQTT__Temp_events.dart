@@ -102,13 +102,8 @@ class TemperatureCubit extends Cubit<TemperatureState> {
     });
   }
 
-  void _onUnsubscribed(String? topic) {
-   // print('Unsubscribed from $topic');
-  }
-
-  void _onPong() {
-   // print('Ping response received');
-  }
+  void _onUnsubscribed(String? topic) {}
+  void _onPong() {}
 
   @override
   Future<void> close() {
