@@ -170,11 +170,11 @@ class _StatusItemState extends State<StatusItem> with SingleTickerProviderStateM
     if (lowerLabel == 'very bad') {
       return const Duration(milliseconds: 700);
     } else if (lowerLabel == 'bad') {
-      return const Duration(milliseconds: 1000);
+      return const Duration(milliseconds: 700);
     } else if (lowerLabel == 'good') {
-      return const Duration(milliseconds: 1800);
+      return const Duration(milliseconds: 700);
     } else if (lowerLabel == 'very good') {
-      return const Duration(milliseconds: 2200);
+      return const Duration(milliseconds: 700);
     } else {
       return const Duration(milliseconds: 1500);
     }
