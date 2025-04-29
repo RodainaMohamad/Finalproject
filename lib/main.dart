@@ -22,9 +22,10 @@ class MyApp extends StatelessWidget {
         'Splashscreen': (context) => const Splashscreen(),
         'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
         'Signin': (context) => const Signin(),
-        'DoctorPatient': (context) =>const DoctorPatient(),
+        'DoctorPatient': (context) => const DoctorPatient(),
         'PatientHome': (context) => const Patienthome(),
-        'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
+        'CreateAccountScreenDoctor': (context) => CreateAccountScreenDoctor(),
+        'DoctortHome': (context) => const Patienthome(),
       },
     );
   }
