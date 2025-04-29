@@ -316,7 +316,7 @@ class PatientHome extends StatelessWidget {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.oxygenRate == null) return "--";
-    return state.oxygenRate!.toStringAsFixed(1); // Formats to 1 decimal place
+    return state.oxygenRate!.toStringAsFixed(1);
   }
   // String _getOxygenValue(OxygenRateState state) {
   //   if (!state.isConnected) return "Connecting";
