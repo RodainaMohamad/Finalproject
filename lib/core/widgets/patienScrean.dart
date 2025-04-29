@@ -1,0 +1,122 @@
+import 'package:flutter/material.dart';
+import 'package:grad_project/core/widgets/patiencard.dart';
+
+import '../../API_integration/models/patientmodel.dart';
+import 'addpatient.dart';
+
+class PatientsScreen extends StatefulWidget {
+  const PatientsScreen({Key? key}) : super(key: key);
+
+  @override
+  State<PatientsScreen> createState() => _PatientsScreenState();
+}
+
+class _PatientsScreenState extends State<PatientsScreen> {
+  bool _isExpanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      setState(() {
+        _isExpanded = true;
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final patients = Patient.getDummyPatients();
+    final double itemAspectRatio = 149 / 47;
+
+    return Scaffold(
+      backgroundColor: const Color(0xff2C999B),
+      body: AnimatedContainer(
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeOutQuart,
+        width: double.infinity,
+        margin: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_isExpanded ? 16 : 0),
+        ),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const Expanded(
+                  child: Divider(
+                    color: Colors.white, 
+                    thickness: 2, 
+                    endIndent: 8, 
+                  ),
+                ),
+                const Text(
+                  'My Patients',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                const Expanded(
+                  child: Divider(
+                    color: Colors.white,
+                    thickness: 2,
+                    indent: 8, 
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 18, right: 18),
+              child: TextField(
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.white,
+                  hintText: 'Search',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Expanded(
+              child: GridView.builder(
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1, 
+                  crossAxisSpacing: 10, 
+                  mainAxisSpacing: 10, 
+                  childAspectRatio:
+                      itemAspectRatio, 
+                ),
+                itemCount: patients.length,
+                itemBuilder: (context, index) {
+                  return PatientCardWidget(patient: patients[index]);
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            builder: (context) {
+              return AddPatientScreen(); 
+            },
+          );
+        },
+        backgroundColor: Colors.white,
+        child: const Icon(
+          Icons.add,
+          color: const Color(0xFF52B696A),
+        ),
+      ),
+    );
+  }
+}

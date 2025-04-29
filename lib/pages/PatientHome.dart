@@ -303,7 +303,6 @@ class PatientHome extends StatelessWidget {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.temperature == null || state.temperature!.isEmpty) return "Waiting";
-    // Format to 1 decimal place
     final temp = double.tryParse(state.temperature!) ?? 0;
     return temp.toStringAsFixed(1);
   }
@@ -316,7 +315,13 @@ class PatientHome extends StatelessWidget {
   String _getOxygenValue(OxygenRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
-    if (state.oxygenRate == null || state.oxygenRate!.isEmpty) return "--";
-    return state.oxygenRate!;
+    if (state.oxygenRate == null) return "--";
+    return state.oxygenRate!.toStringAsFixed(1); // Formats to 1 decimal place
   }
+  // String _getOxygenValue(OxygenRateState state) {
+  //   if (!state.isConnected) return "Connecting";
+  //   if (state.error != null) return "Error";
+  //   if (state.oxygenRate == null || state.oxygenRate!.isEmpty) return "--";
+  //   return state.oxygenRate!;
+  // }
 }
