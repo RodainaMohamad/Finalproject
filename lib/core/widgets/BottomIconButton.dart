@@ -13,36 +13,32 @@ class BottomIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Material(
-          color: Colors.transparent, // لا يوجد لون افتراضي
-          child: InkWell(
-            onTap: onPressed, // تفاعل الضغط
-            borderRadius: BorderRadius.circular(35),
-            child: Container(
-              height:120.3,
-              width: 52,
-              decoration:  BoxDecoration(
-                color: primary,
-                shape: BoxShape.circle,
-                boxShadow: const [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 5,
-                    offset: Offset(0, 2),
-                  ),
-                ],
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          height: 40,
+          width: 40,
+          decoration: BoxDecoration(
+            color: primary,
+            shape: BoxShape.circle,
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 5,
+                offset: Offset(0, 2),
               ),
-              child: Icon(
-                icon,
-                color: secondary,
-                size: 35,
-              ),
-            ),
+            ],
+          ),
+          child: Icon(
+            icon,
+            color: secondary,
+            size: 24,
           ),
         ),
-      ],
+      ),
     );
   }
 }

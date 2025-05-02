@@ -288,7 +288,7 @@ class PatientHome extends StatelessWidget {
                       title: "My Medicine",
                       content: "No this time.",
                     ),
-                    SizedBox(height: height * 0.021),
+                    SizedBox(height: height * 0.057),
                     BottomNavWidget(),
                   ],
                 ),

@@ -9,7 +9,6 @@ class PatientStatusPage extends StatelessWidget {
     'Good',
     'Very Bad',
   ];
-
   PatientStatusPage({super.key});
 
   @override
@@ -27,7 +26,6 @@ class PatientStatusPage extends StatelessWidget {
                 } else if (constraints.maxWidth >= 600) {
                   crossAxisCount = 4;
                 }
-
                 return Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16.0),
@@ -44,8 +42,8 @@ class PatientStatusPage extends StatelessWidget {
                   ),
                   child: Column(
                     children: [
-                      Row(
-                        children: const [
+                      const Row(
+                        children: [
                           Expanded(
                             child: Divider(
                               color: Colors.white,

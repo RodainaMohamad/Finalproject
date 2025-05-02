@@ -42,140 +42,142 @@ class Doctorhome extends StatelessWidget {
             end: Alignment.bottomRight,
           ),
         ),
-        child: Column(
-          children: [
-            SizedBox(height: height * 0.062),
-            Padding(
-              padding: EdgeInsets.all(width * 0.01),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  //logo + divider
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Divider(
-                          color: secondary,
-                          thickness: 0.5,
-                          indent: width * 0.3,
-                          endIndent: width * 0.02,
-                        ),
-                      ),
-                      Image.asset(
-                        "assets/nabdLogo.png",
-                        width: width * 0.2,
-                        height: height * 0.07,
-                      ),
-                      Expanded(
-                        child: Divider(
-                          color: secondary,
-                          thickness: 0.5,
-                          indent: width * 0.02,
-                          endIndent: width * 0.3,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: height * 0.001),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Text section (Welcome, Mohamed Ahmed)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Welcome",
-                            style: GoogleFonts.nunito(
-                              fontSize: 20,
-                              height: 1.4,
-                              fontWeight: FontWeight.w700,
-                              color: secondary,
-                            ),
-                            textAlign: TextAlign.right,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              SizedBox(height: height * 0.062),
+              Padding(
+                padding: EdgeInsets.all(width * 0.01),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    //logo + divider
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Divider(
+                            color: secondary,
+                            thickness: 0.5,
+                            indent: width * 0.3,
+                            endIndent: width * 0.02,
                           ),
-                          Text(
-                            "Mohamed Ahmed ...",
-                            style: GoogleFonts.nunito(
-                              fontSize: 10,
-                              height: 1.4,
-                              fontWeight: FontWeight.w700,
-                              color: secondary,
-                            ),
-                            textAlign: TextAlign.right,
+                        ),
+                        Image.asset(
+                          "assets/nabdLogo.png",
+                          width: width * 0.2,
+                          height: height * 0.07,
+                        ),
+                        Expanded(
+                          child: Divider(
+                            color: secondary,
+                            thickness: 0.5,
+                            indent: width * 0.02,
+                            endIndent: width * 0.3,
                           ),
-                        ],
-                      ),
-                      SizedBox(width: width * 0.02),
-                      // CircleAvatar (center)
-                      CircleAvatar(
-                        radius: width * 0.07,
-                        backgroundImage:
-                            const AssetImage("assets/patientAvatar.png"),
-                      ),
-                      SizedBox(width: width * 0.1),
-                      // Icons section
-                      Row(
-                        children: List.generate(
-                          icons.length,
-                          (index) => GestureDetector(
-                            onTap: () =>
-                                Navigator.pushNamed(context, routes[index]),
-                            child: Stack(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.all(width * 0.02),
-                                  child: Container(
-                                    width: width * 0.09,
-                                    height: width * 0.12,
-                                    decoration: BoxDecoration(
-                                      color: secondary,
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      icons[index],
-                                      size: width * 0.06,
-                                      color: primary,
-                                    ),
-                                  ),
-                                ),
-                                if (index == 2 && hasNotification)
-                                  Positioned(
-                                    bottom: width * 0.02,
-                                    right: width * 0.02,
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: height * 0.001),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Text section (Welcome, Mohamed Ahmed)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "Welcome",
+                              style: GoogleFonts.nunito(
+                                fontSize: 20,
+                                height: 1.4,
+                                fontWeight: FontWeight.w700,
+                                color: secondary,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                            Text(
+                              "Dr/Mohamed Ahmed ...",
+                              style: GoogleFonts.nunito(
+                                fontSize: 10,
+                                height: 1.4,
+                                fontWeight: FontWeight.w700,
+                                color: secondary,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ],
+                        ),
+                        SizedBox(width: width * 0.02),
+                        // CircleAvatar (center)
+                        CircleAvatar(
+                          radius: width * 0.07,
+                          backgroundImage:
+                              const AssetImage("assets/patientAvatar.png"),
+                        ),
+                        SizedBox(width: width * 0.1),
+                        // Icons section
+                        Row(
+                          children: List.generate(
+                            icons.length,
+                            (index) => GestureDetector(
+                              onTap: () =>
+                                  Navigator.pushNamed(context, routes[index]),
+                              child: Stack(
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.all(width * 0.02),
                                     child: Container(
-                                      width: width * 0.04,
-                                      height: width * 0.04,
+                                      width: width * 0.09,
+                                      height: width * 0.12,
                                       decoration: BoxDecoration(
-                                        color: notifications,
+                                        color: secondary,
                                         shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        icons[index],
+                                        size: width * 0.06,
+                                        color: primary,
                                       ),
                                     ),
                                   ),
-                              ],
+                                  if (index == 2 && hasNotification)
+                                    Positioned(
+                                      bottom: width * 0.02,
+                                      right: width * 0.02,
+                                      child: Container(
+                                        width: width * 0.04,
+                                        height: width * 0.04,
+                                        decoration: BoxDecoration(
+                                          color: notifications,
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: height * 0.01),
-            Container(height: 358, child: PatientStatusPage()),
-            SizedBox(height: 10),
-            PatientSection(
-              onTap: () => _showCustomScreenDialog(context, 'patients'),
-            ),
-            SizedBox(height: 10),
-            StaffSection(
-              onTap: () => _showCustomScreenDialog(context, 'staff'),
-            ),
-            SizedBox(height: height * 0.021),
-            BottomNavWidget(),
-          ],
+              SizedBox(height: height * 0.01),
+              Container(height: 358, child: PatientStatusPage()),
+              SizedBox(height: 10),
+              PatientSection(
+                onTap: () => _showCustomScreenDialog(context, 'patients'),
+              ),
+              SizedBox(height: 10),
+              StaffSection(
+                onTap: () => _showCustomScreenDialog(context, 'staff'),
+              ),
+              SizedBox(height: height * 0.021),
+              BottomNavWidget(),
+            ],
+          ),
         ),
       ),
     );
