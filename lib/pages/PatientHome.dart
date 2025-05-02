@@ -302,7 +302,7 @@ class PatientHome extends StatelessWidget {
   String _getDisplayValue(TemperatureState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
-    if (state.temperature == null || state.temperature!.isEmpty) return "Waiting";
+    if (state.temperature == null || state.temperature!.isEmpty) return "--";
     final temp = double.tryParse(state.temperature!) ?? 0;
     return temp.toStringAsFixed(1);
   }
@@ -318,10 +318,4 @@ class PatientHome extends StatelessWidget {
     if (state.oxygenRate == null) return "--";
     return state.oxygenRate!.toStringAsFixed(1);
   }
-  // String _getOxygenValue(OxygenRateState state) {
-  //   if (!state.isConnected) return "Connecting";
-  //   if (state.error != null) return "Error";
-  //   if (state.oxygenRate == null || state.oxygenRate!.isEmpty) return "--";
-  //   return state.oxygenRate!;
-  // }
 }

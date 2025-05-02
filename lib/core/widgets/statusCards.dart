@@ -7,7 +7,6 @@ class StatusCard extends StatelessWidget {
   final String title;
   final String value;
   final String unit;
-  // final String normalRange;
 
   StatusCard({
     super.key,
@@ -15,8 +14,8 @@ class StatusCard extends StatelessWidget {
     required this.title,
     required this.value,
     required this.unit,
-    // required this.normalRange,
   });
+
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
@@ -67,8 +66,8 @@ class StatusCard extends StatelessWidget {
                   Text(
                     unit,
                     style: GoogleFonts.nunito(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w300,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
                       color: secondary,
                     ),
                   ),
