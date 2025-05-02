@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:grad_project/cubits/HeartRate_events.dart';
+import 'package:grad_project/cubits/MQTT__Temp_events.dart';
+import 'package:grad_project/cubits/OxygenRate_events.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
 import 'package:grad_project/pages/Doctorhome.dart';
 import 'package:grad_project/pages/PatientHome.dart';
@@ -16,9 +20,15 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MultiBlocProvider(
+        providers: [
+        BlocProvider(create: (context) => HeartRateCubit()),
+        BlocProvider(create: (context) => TemperatureCubit()),
+        BlocProvider(create: (context) => OxygenRateCubit()),
+    ],
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: "Splashscreen",
+      initialRoute: "PatientHome",
       routes: {
         'Splashscreen': (context) => const Splashscreen(),
         'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
@@ -28,6 +38,6 @@ class MyApp extends StatelessWidget {
         'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
         'DoctortHome':(context)=>const Doctorhome(),
       },
-    );
+    ));
   }
 }

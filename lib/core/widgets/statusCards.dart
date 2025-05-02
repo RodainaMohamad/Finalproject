@@ -20,7 +20,7 @@ class StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height; // Corrected height
+    final height = MediaQuery.of(context).size.height;
 
     return Row(
       children: [
@@ -39,8 +39,6 @@ class StatusCard extends StatelessWidget {
                 children: [
                   image,
                   SizedBox(width: width * 0.01),
-                  //title of card
-
                   Text(
                     title,
                     style: GoogleFonts.nunito(
