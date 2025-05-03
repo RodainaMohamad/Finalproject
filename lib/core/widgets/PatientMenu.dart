@@ -128,7 +128,7 @@ void _showAddScreenDialog(BuildContext context, String type) {
     barrierDismissible: true,
     builder: (BuildContext context) {
       return Dialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(25),
         ),
@@ -136,7 +136,7 @@ void _showAddScreenDialog(BuildContext context, String type) {
         child: Container(
           width: double.infinity,
           constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.5,
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
             maxWidth: MediaQuery.of(context).size.width,
           ),
           decoration: BoxDecoration(
