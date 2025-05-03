@@ -174,40 +174,46 @@ class OxygenRateCubit extends Cubit<OxygenRateState> {
   }
 
   void _onConnected() {
+    print('✅ Successfully connected to MQTT broker');
     client.subscribe(topic, MqttQos.atMostOnce);
   }
-
   void _onDisconnected() {
     emit(state.copyWith(isConnected: false));
     Future.delayed(const Duration(seconds: 5), _connectToMqtt);
   }
-  double? _parseOxygenRate(String payload) {
-    final numericRegex = RegExp(r'\d+\.?\d*');
-    final match = numericRegex.firstMatch(payload);
-    final value = match?.group(0);
 
-    if (value != null) {
-      final doubleValue = double.tryParse(value);
-      if (doubleValue != null && doubleValue >= 0 && doubleValue <= 100) {
-        return doubleValue;
-      }
+  double? _parseOxygenRate(String payload) {
+    // Handle formats like "SpO2: 95.0%"
+    final regex = RegExp(r'SpO2:\s*(\d+\.?\d*)%?');
+    final match = regex.firstMatch(payload);
+
+    if (match != null && match.groupCount >= 1) {
+      final valueString = match.group(1);
+      return double.tryParse(valueString ?? '');
     }
-    return null;
+    // Fallback to direct parsing if format doesn't match
+    return double.tryParse(payload.trim());
   }
 
   void _onSubscribed(String topic) {
     client.updates!.listen((List<MqttReceivedMessage<MqttMessage>> c) {
       final recMess = c[0].payload as MqttPublishMessage;
       final pt = MqttPublishPayload.bytesToStringAsString(recMess.payload.message);
-      print('Raw message: $pt');
+      print('📦 Raw MQTT payload: "$pt"');
       final o2Value = _parseOxygenRate(pt);
       if (o2Value != null) {
-        emit(state.copyWith(oxygenRate: o2Value, error: null));
+        emit(state.copyWith(
+          oxygenRate: o2Value,
+          rawValue: pt,  // Store raw message for debugging
+          error: null,
+        ));
       } else {
-        emit(state.copyWith(error: 'Invalid SpO2 data: $pt'));
+        print('❌ Failed to parse oxygen value from: $pt');
+        emit(state.copyWith(
+          error: 'Invalid SpO2 data: $pt',
+          rawValue: pt,  // Store raw message even on error
+        ));
       }
-    }, onError: (error) {
-      emit(state.copyWith(error: 'MQTT update error: $error'));
     });
   }
 

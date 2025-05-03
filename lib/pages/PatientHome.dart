@@ -241,9 +241,9 @@ class PatientHome extends StatelessWidget {
                               builder: (context, state) {
                                 return StatusCard(
                                   image: Image.asset("assets/pressure.png"),
+                                  unit: "%",
                                   title: "Oxygen",
                                   value: _getOxygenValue(state),
-                                  unit: "%",
                                 );
                               },
                             ),
@@ -281,18 +281,17 @@ class PatientHome extends StatelessWidget {
     final temp = double.tryParse(state.temperature!) ?? 0;
     return temp.toStringAsFixed(1);
   }
-
   String _getHeartRateValue(HeartRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.heartRate == null || state.heartRate!.isEmpty) return "--";
     return state.heartRate!;
   }
-
   String _getOxygenValue(OxygenRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.oxygenRate == null) return "--";
+    // Display with 1 decimal place
     return state.oxygenRate!.toStringAsFixed(1);
   }
 }

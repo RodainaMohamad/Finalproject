@@ -1,25 +1,34 @@
-import 'dart:convert';
 import 'package:grad_project/API_integration/api.dart';
-import 'package:grad_project/API_integration/models/LoginModel.dart';
 
 class LoginService {
-  Future<LoginModel> login({
+  final Api _api = Api();
+
+  Future<Map<String, String>> login({
     required String email,
     required String password,
   }) async {
     try {
-      final loginModel = LoginModel(
-        email: email,
-        password: password,
-      );
-      print('Request Body: ${jsonEncode(loginModel.toJson())}');
-      final response = await Api().post(
+      final response = await _api.post(
         url: "http://nabdapi.runasp.net/login",
-        body: loginModel.toJson(),
+        body: {
+          'email': email,
+          'password': password,
+          'twoFactorCode': '',
+          'twoFactorRecoveryCode': '',
+        },
       );
-      return LoginModel.fromJson(response);
+      final accessToken = response['accessToken'] as String?;
+      final refreshToken = response['refreshToken'] as String?;
+
+      if (accessToken == null || refreshToken == null) {
+        throw Exception('Missing access token or refresh token in response');
+      }
+      return {
+        'accessToken': accessToken,
+        'refreshToken': refreshToken,
+      };
     } catch (e) {
-      throw Exception("Failed to register: $e");
+      throw Exception('Login failed: ${e.toString()}');
     }
   }
 }

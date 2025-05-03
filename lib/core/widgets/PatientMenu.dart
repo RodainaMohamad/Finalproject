@@ -4,6 +4,7 @@ import 'package:grad_project/core/widgets/addDoctor.dart';
 import 'package:grad_project/core/widgets/addguardian.dart';
 
 class Menu extends StatelessWidget {
+
   const Menu({Key? key}) : super(key: key);
 
   @override
@@ -71,7 +72,7 @@ class Menu extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.add, color: Colors.white),
                 onPressed: () {
-                  Navigator.pop(context); // Close Menu dialog
+                  Navigator.pop(context);
                   _showAddScreenDialog(context, 'guardian');
                 },
               ),
@@ -102,7 +103,7 @@ class Menu extends StatelessWidget {
               trailing: IconButton(
                 icon: const Icon(Icons.add, color: Colors.white),
                 onPressed: () {
-                  Navigator.pop(context); // Close Menu dialog
+                  Navigator.pop(context);
                   _showAddScreenDialog(context, 'doctor');
                 },
               ),
@@ -118,7 +119,7 @@ class Menu extends StatelessWidget {
 void showMenuDialog(BuildContext context) {
   showDialog(
     context: context,
-    builder: (context) => const Menu(),
+    builder: (context) => Menu(),
   );
 }
 
@@ -153,7 +154,7 @@ void _showAddScreenDialog(BuildContext context, String type) {
 Widget _buildAddScreenContent(String type) {
   switch (type) {
     case 'guardian':
-      return const AddGuardianScreen();
+      return AddGuardianScreen();
     case 'doctor':
       return const AddDoctorScreen();
     default:

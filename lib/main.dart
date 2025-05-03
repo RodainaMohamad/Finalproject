@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:grad_project/cubits/HeartRate_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_events.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
@@ -13,6 +14,16 @@ import 'package:grad_project/pages/create_account_patient.dart';
 
 void main() {
   runApp(const MyApp());
+}
+void testStorage() async {
+  final storage = FlutterSecureStorage();
+  try {
+    await storage.write(key: 'test_key', value: 'test_value');
+    final value = await storage.read(key: 'test_key');
+    print('Secure storage test: $value');
+  } catch (e) {
+    print('Secure storage error: $e');
+  }
 }
 
 class MyApp extends StatelessWidget {

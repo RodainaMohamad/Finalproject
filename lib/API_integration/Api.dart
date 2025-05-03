@@ -31,7 +31,8 @@ class Api {
         },
         body: jsonEncode(body),
       );
-      if (response.statusCode == 200) {
+      print('API Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body}');
+      if (response.statusCode == 200 || response.statusCode == 201) {
         return jsonDecode(response.body);
       } else {
         throw Exception(

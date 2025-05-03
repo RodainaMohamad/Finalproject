@@ -3,11 +3,14 @@ import 'package:grad_project/API_integration/api.dart';
 import 'package:grad_project/API_integration/models/AddDoctorModel.dart';
 
 class DoctorService {
+  final Api _api = Api();
+
   Future<AddDoctorModel> addDoctor({
-    String? name,
-    String? ssn,
-    String? role,
-    String? specialization,
+    required String name,
+    required String ssn,
+    required String role,
+    required String specialization,
+    required String token,
   }) async {
     try {
       final doctorModel = AddDoctorModel(
@@ -17,32 +20,36 @@ class DoctorService {
         specialization: specialization,
       );
       print('Request Body: ${jsonEncode(doctorModel.toJson())}');
-      final response = await Api().post(
+      final response = await _api.post(
         url: "http://nabdapi.runasp.net/api/Doctors",
         body: doctorModel.toJson(),
+        token: token,
       );
       return AddDoctorModel.fromJson(response);
     } catch (e) {
-      // Handle error from Api().post
       String errorMessage = "Failed to add doctor: $e";
       String rawError = e.toString();
       print('Raw API Error Response: $rawError');
 
-      // Parse the exception message to extract the body
       try {
-        // Expect message like "Failed to load data: 400 with body {...}"
         final bodyMatch = RegExp(r'with body (.*)$').firstMatch(rawError);
         if (bodyMatch != null) {
           String body = bodyMatch.group(1)!;
           print('Extracted API Error Body: $body');
-          try {
-            final jsonResponse = jsonDecode(body);
-            if (jsonResponse is Map) {
-              errorMessage = jsonResponse['message'] ?? errorMessage;
+          if (rawError.contains('401')) {
+            errorMessage = "Unauthorized: Please check your authentication credentials.";
+          } else if (body.trim().isEmpty) {
+            errorMessage = "Server error: No response body returned";
+          } else {
+            try {
+              final jsonResponse = jsonDecode(body);
+              if (jsonResponse is Map) {
+                errorMessage = jsonResponse['message'] ?? errorMessage;
+              }
+            } catch (jsonError) {
+              print('Error parsing body as JSON: $jsonError');
+              errorMessage = body;
             }
-          } catch (jsonError) {
-            print('Error parsing body as JSON: $jsonError');
-            errorMessage = body; // Use raw body if not JSON
           }
         } else {
           print('No body found in error message');
