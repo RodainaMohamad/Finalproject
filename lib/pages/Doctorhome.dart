@@ -17,12 +17,12 @@ class Doctorhome extends StatelessWidget {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final icons = [
-      Icons.message_rounded,
+      //Icons.message_rounded,
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
     ];
     final routes = [
-      '/messages',
+     // '/messages',
       '/menu',
       '/notifications',
     ];
@@ -166,11 +166,11 @@ class Doctorhome extends StatelessWidget {
               ),
               SizedBox(height: height * 0.01),
               Container(height: 358, child: PatientStatusPage()),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               PatientSection(
                 onTap: () => _showCustomScreenDialog(context, 'patients'),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               StaffSection(
                 onTap: () => _showCustomScreenDialog(context, 'staff'),
               ),
@@ -195,7 +195,7 @@ void _showCustomScreenDialog(BuildContext context, String type) {
           vertical: 24,
         ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(25),
         ),
         backgroundColor: Colors.transparent,
         child: Container(
@@ -205,8 +205,8 @@ void _showCustomScreenDialog(BuildContext context, String type) {
             maxWidth: MediaQuery.of(context).size.width,
           ),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(255, 255, 255, 0.1),
-            borderRadius: BorderRadius.circular(16),
+            color: const Color.fromRGBO(255, 255, 255, 0.1),
+            borderRadius: BorderRadius.circular(25),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -227,7 +227,6 @@ void _showCustomScreenDialog(BuildContext context, String type) {
     },
   );
 }
-
 Widget _buildCustomScreenContent(String type) {
   switch (type) {
     case 'patients':

@@ -11,7 +11,7 @@ class AddReport extends StatelessWidget {
         children: [
           Expanded(
             child: Container(
-              height: 300,
+              height: 350,
               width: double.infinity,
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
@@ -88,7 +88,7 @@ class AddReport extends StatelessWidget {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    decoration: BoxDecoration(
+                                    decoration: const BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
                                       boxShadow: [

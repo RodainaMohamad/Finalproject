@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/core/constants/colours/colours.dart';
 
 class PatientSection extends StatelessWidget {
   final VoidCallback onTap;
@@ -14,28 +15,28 @@ class PatientSection extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           decoration: BoxDecoration(
-            color: Color.fromRGBO(255, 255, 2555, 0.1),
-            borderRadius: BorderRadius.circular(15),
+            color: const Color.fromRGBO(255, 255, 2555, 0.1),
+            borderRadius: BorderRadius.circular(25),
             border: Border.all(
-              color: Colors.white,  
+              color: secondary,
               width: .6,  
             ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Your Patients',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: secondary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Container(
                 padding: const EdgeInsets.all(5),
-                decoration: const BoxDecoration(
-                  color: Colors.white,
+                decoration: BoxDecoration(
+                  color: secondary,
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
