@@ -87,7 +87,6 @@ class _PatientsScreenState extends State<PatientsScreen> {
   @override
   Widget build(BuildContext context) {
     const double itemAspectRatio = 149 / 47;
-
     return Scaffold(
       backgroundColor: const Color(0xff2C999B),
       body: AnimatedContainer(
@@ -150,7 +149,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
                   : _displayedPatients.isEmpty
                   ? const Center(child: Text('No patients found'))
                   : GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
