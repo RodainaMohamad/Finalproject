@@ -16,6 +16,7 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
   final TextEditingController _relationshipController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _patientSSNController = TextEditingController();
 
   // Animation
   late AnimationController _animationController;
@@ -50,6 +51,7 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
     _relationshipController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
+    _patientSSNController.dispose();
     super.dispose();
   }
 
@@ -73,19 +75,19 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
   }
 
   Future<void> _submitForm() async {
-    // Get and trim all field values
     final name = _nameController.text.trim();
     final relationship = _relationshipController.text.trim();
     final email = _emailController.text.trim();
     final phone = _cleanPhoneNumber(_phoneController.text.trim());
+    final patientSSN = _patientSSNController.text.trim();
 
     // Validate all required fields
-    if (name.isEmpty || relationship.isEmpty || phone.isEmpty || email.isEmpty) {
+    if (name.isEmpty || relationship.isEmpty || phone.isEmpty || email.isEmpty || patientSSN.isEmpty) {
       _showErrorDialog('All fields are required');
       return;
     }
 
-    // Validate email format (user123@example.com)
+    // Validate email format
     if (!_validateEmail(email)) {
       _showErrorDialog('Please enter a valid email (user123@example.com)');
       return;
@@ -97,6 +99,10 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
       return;
     }
 
+    if (patientSSN.length < 13) {
+      _showErrorDialog('Patient SSN more than 13 digits');
+      return;
+    }
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -111,8 +117,8 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
         relationship: relationship,
         phoneNumber: phone,
         email: email,
+        patientSSN: patientSSN,
         token: token,
-       // ssn: ssn,
       );
 
       _showSuccessDialog();
@@ -131,6 +137,7 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
       }
     }
   }
+
   void _showSuccessDialog() {
     _animationController.forward(from: 0);
     showDialog(
@@ -384,6 +391,26 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
                   const SizedBox(height: 4),
                   TextField(
                     controller: _phoneController,
+                    keyboardType: TextInputType.phone,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'patient SSN',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  TextField(
+                    controller: _patientSSNController,
                     keyboardType: TextInputType.phone,
                     decoration: InputDecoration(
                       filled: true,

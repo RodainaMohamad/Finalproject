@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
+import 'package:grad_project/core/widgets/DoctorMenu.dart';
 import '../core/widgets/HomeBottomBar.dart';
 import '../core/widgets/patienScrean.dart';
 import '../core/widgets/patientSection.dart';
@@ -120,9 +121,14 @@ class Doctorhome extends StatelessWidget {
                         Row(
                           children: List.generate(
                             icons.length,
-                            (index) => GestureDetector(
-                              onTap: () =>
-                                  Navigator.pushNamed(context, routes[index]),
+                                (index) => GestureDetector(
+                              onTap: () {
+                                if (index == 0) {
+                                  showMenuDialog(context);
+                                } else {
+                                  Navigator.pushNamed(context, routes[index]);
+                                }
+                              },
                               child: Stack(
                                 children: [
                                   Padding(

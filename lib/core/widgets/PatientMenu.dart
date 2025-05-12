@@ -39,9 +39,17 @@ class Menu extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
+                Container(
+                  width: 39, // Smaller width
+                  height: 39, // Smaller height
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: secondary,
+                  ),
+                  child: IconButton(
+                    icon:Icon(Icons.close, color:primary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ],
             ),
@@ -69,12 +77,20 @@ class Menu extends StatelessWidget {
                   ),
                 ),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showAddScreenDialog(context, 'guardian');
-                },
+              trailing: Container(
+                width: 39, // Smaller width
+                height: 39, // Smaller height
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: secondary,
+                ),
+                child: IconButton(
+                  icon:Icon(Icons.add, color: primary),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showAddScreenDialog(context, 'guardian');
+                  },
+                ),
               ),
             ),
             ListTile(
@@ -100,12 +116,20 @@ class Menu extends StatelessWidget {
                   ),
                 ),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context);
-                  _showAddScreenDialog(context, 'doctor');
-                },
+              trailing: Container(
+                width: 39, // Smaller width
+                height: 39, // Smaller height
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: secondary,
+                ),
+                child: IconButton(
+                  icon:Icon(Icons.add, color:primary),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _showAddScreenDialog(context, 'doctor');
+                  },
+                ),
               ),
             ),
           ],
@@ -122,7 +146,6 @@ void showMenuDialog(BuildContext context) {
     builder: (context) => Menu(),
   );
 }
-
 void _showAddScreenDialog(BuildContext context, String type) {
   showDialog(
     context: context,
@@ -150,7 +173,6 @@ void _showAddScreenDialog(BuildContext context, String type) {
     },
   );
 }
-
 Widget _buildAddScreenContent(String type) {
   switch (type) {
     case 'guardian':

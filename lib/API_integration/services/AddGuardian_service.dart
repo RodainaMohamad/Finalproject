@@ -11,7 +11,7 @@ class AddGuardianService {
     required String relationship,
     required String phoneNumber,
     required String email,
-    //required int? ssn,
+    required String patientSSN,
     required String token,
   }) async {
     try {
@@ -30,13 +30,15 @@ class AddGuardianService {
         relationship: relationship,
         phoneNumber: phoneNumber,
         email: email,
-        //ssn:ssn,
+        patientSSN: patientSSN, // Include in body if required by API
       );
 
       print('Request Body: ${jsonEncode(addGuardian.toJson())}');
 
+      final url = "http://nabdapi.runasp.net/api/Guardians?patientSSN=$patientSSN";
+
       final response = await Api().post(
-        url: "http://nabdapi.runasp.net/api/Guardians",
+        url: url,
         body: addGuardian.toJson(),
         token: token, // Use the passed token
       );

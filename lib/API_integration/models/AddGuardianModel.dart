@@ -3,14 +3,14 @@ String? name;
 String? relationship;
 String? phoneNumber;
 String? email;
-//int? ssn;
+String? patientSSN;
 
 AddGuardianModel({
       this.name, 
       this.relationship, 
       this.phoneNumber,
       this.email,
-      //this.ssn,
+      this.patientSSN,
   });
 
   AddGuardianModel.fromJson(dynamic json) {
@@ -18,16 +18,15 @@ AddGuardianModel({
     relationship = json['relationship'];
     phoneNumber = json['phoneNumber'];
     email = json['email'];
-    //ssn = json['ssn'];
+    patientSSN = json['patientSSN'];
   }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = <String, dynamic>{};
-    if(name!=null)map['name']=name;
-    if(relationship!=null)map['relationship']=relationship;
-    if(phoneNumber!=null)map['phoneNumber']=phoneNumber;
-    if(email!=null)map['email']=email;
-   // if(ssn!=null)map['ssn']=ssn;
-    return map;
-  }
+Map<String, dynamic> toJson() {
+  return {
+    'name': name,
+    'relationship': relationship,
+    'phoneNumber': phoneNumber,
+    'email': email,
+    'patientSSN': patientSSN ?? '', // Send empty string instead of null
+  };
+}
 }

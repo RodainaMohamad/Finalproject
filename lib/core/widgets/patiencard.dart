@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../API_integration/models/patientmodel.dart';
 import 'addreport.dart';
 
@@ -13,209 +12,210 @@ class PatientCardWidget extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final cardWidth = screenWidth * 0.4;
-        final cardHeight = 80.0;
+        final cardWidth = screenWidth * 0.9; // Full width for GridView item
+        final cardHeight = cardWidth / 3.5; // Matches childAspectRatio: 3.5
 
-        return SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: Container(
-            width: cardWidth,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.1),
-              border: Border.all(color: Colors.white, width: 0.6),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8, right: 4, top: 6),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: cardHeight * 0.45,
-                          height: cardHeight * 0.45,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.asset(
-                              patient.profileImage,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'Dennisa Nedry',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: cardHeight * 0.15,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              Text(
-                                'ID: 20254831 • Location: Assut • Age: 23',
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: cardHeight * 0.1,
-                                ),
-                              ),
-                              const SizedBox(height: 5),
-                            ],
-                          ),
-                        ),
-                        PopupMenuButton<String>(
-                          color: const Color(0xFF1E5A5E),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          onSelected: (value) {
-                            if (value == 'delete') {
-                              // حذف العنصر
-                            } else if (value == 'edit') {
-                              // تعديل العنصر
-                            }
-                          },
-                          itemBuilder: (context) => [
-                            PopupMenuItem(
-                              value: 'delete',
-                              child: Text(
-                                'Delete',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: cardHeight * 0.2,
-                                ),
-                              ),
-                            ),
-                            PopupMenuItem(
-                              value: 'edit',
-                              child: Text(
-                                'Edit',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: cardHeight * 0.2,
-                                ),
-                              ),
-                            ),
-                          ],
-                          child: SizedBox(
-                            width: cardHeight * 0.2,
-                            height: cardHeight * 0.25,
-                            child: const Icon(
-                              Icons.more_vert,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-                        ),
-                      ],
+        return Container(
+          width: cardWidth,
+          height: cardHeight,
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            border: Border.all(color: Colors.white, width: 0.6),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(6.0), // Reduced padding
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Profile Image
+                Container(
+                  width: cardHeight * 0.35, // Reduced size
+                  height: cardHeight * 0.35,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(color: Colors.white, width: 1),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(3),
+                    child: Image.network(
+                      patient.profileImage,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) =>
+                      const Icon(Icons.person, color: Colors.white),
                     ),
                   ),
-                  Flexible(
-                    child: Padding(
-                      padding:
-                          const EdgeInsets.only(left: 24, right: 8, bottom: 6),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                   
-                                },
-                                child: Container(
-                                  height: cardHeight * 0.225,
-                                  width: cardWidth * 0.28,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xff2C6768),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                  child: Text(
-                                    'Check Profile',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: cardHeight * 0.1,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 4),
-                              GestureDetector(
-                                onTap: () {
-                                  showModalBottomSheet(
-                                    context: context,
-                                    backgroundColor: Colors.transparent,
-                                    builder: (context) {
-                                      return Center(
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.9,
-                                          padding: const EdgeInsets.all(16),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xff2C999B),
-                                            borderRadius:
-                                                BorderRadius.circular(25),
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 1,
-                                            ),
-                                          ),
-                                          child: AddReport(),
+                ),
+                const SizedBox(width: 6), // Reduced spacing
+                // Patient Info and Buttons
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Patient Name and SSN
+                      Text(
+                        patient.name ?? 'Unknown',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: cardHeight * 0.14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      Text(
+                        'SSN: ${patient.ssn ?? 'N/A'} • Age: 25',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: cardHeight * 0.09,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      const SizedBox(height: 3),
+                      // Buttons and Status
+                      Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            // Buttons
+                            Flexible(
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        // Implement Check Profile
+                                      },
+                                      child: Container(
+                                        height: cardHeight * 0.18,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xff2C6768),
+                                          borderRadius: BorderRadius.circular(2),
                                         ),
-                                      );
-                                    },
-                                  );
-                                },
-                                child: Container(
-                                  height: cardHeight * 0.225,
-                                  width: cardWidth * 0.28,
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xff2C6768),
-                                    borderRadius: BorderRadius.circular(2),
-                                  ),
-                                  child: Text(
-                                    'Add Report',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: cardHeight * 0.1,
-                                      fontWeight: FontWeight.bold,
+                                        child: Text(
+                                          'Check Profile',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: cardHeight * 0.08,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
+                                  const SizedBox(width: 3),
+                                  Expanded(
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          backgroundColor: Colors.transparent,
+                                          builder: (context) {
+                                            return Center(
+                                              child: Container(
+                                                width: screenWidth * 0.9,
+                                                padding:
+                                                const EdgeInsets.all(16),
+                                                decoration: BoxDecoration(
+                                                  color: const Color(0xff2C999B),
+                                                  borderRadius:
+                                                  BorderRadius.circular(25),
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: AddReport(),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      },
+                                      child: Container(
+                                        height: cardHeight * 0.18,
+                                        alignment: Alignment.center,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xff2C6768),
+                                          borderRadius: BorderRadius.circular(2),
+                                        ),
+                                        child: Text(
+                                          'Add Report',
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: cardHeight * 0.08,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 6),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: _buildPatientStatus(
-                                patient.status, cardHeight * 0.35),
-                          ),
-                        ],
+                            ),
+                            // Status Indicator
+                            _buildPatientStatus(
+                                patient.status ?? 'Unknown', cardHeight * 0.25),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 6),
+                // Popup Menu
+                PopupMenuButton<String>(
+                  color: const Color(0xFF1E5A5E),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      // Implement delete functionality
+                    } else if (value == 'edit') {
+                      // Implement edit functionality
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(
+                        'Delete',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: cardHeight * 0.14,
+                        ),
                       ),
                     ),
+                    PopupMenuItem(
+                      value: 'edit',
+                      child: Text(
+                        'Edit',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: cardHeight * 0.14,
+                        ),
+                      ),
+                    ),
+                  ],
+                  child: SizedBox(
+                    width: cardHeight * 0.15, // Reduced size
+                    height: cardHeight * 0.25,
+                    child: const Icon(
+                      Icons.more_vert,
+                      color: Colors.white,
+                      size: 14,
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         );
@@ -251,7 +251,7 @@ class PatientCardWidget extends StatelessWidget {
         gradientColors = [Colors.grey, Colors.grey];
     }
 
-    final circleDiameter = sizeFactor * 1.2;
+    final circleDiameter = sizeFactor * 1.7;
     final innerCircleDiameter = circleDiameter * 0.65;
     final fontSize = innerCircleDiameter * 0.4;
 
@@ -279,10 +279,11 @@ class PatientCardWidget extends StatelessWidget {
             status,
             textAlign: TextAlign.center,
             style: TextStyle(
-              color: Color(0xFF5DC1C3),
+              color: const Color(0xFF5DC1C3),
               fontSize: fontSize,
               fontWeight: FontWeight.bold,
             ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ),

@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
-import 'package:grad_project/core/widgets/addDoctor.dart';
-import 'package:grad_project/core/widgets/addguardian.dart';
 import 'package:grad_project/core/widgets/addpatient.dart';
-import 'package:grad_project/core/widgets/addreport.dart';
+import 'package:grad_project/core/widgets/addstaff.dart';
 
 class Menu extends StatelessWidget {
   const Menu({Key? key}) : super(key: key);
@@ -32,26 +30,43 @@ class Menu extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  child:  Text(
-                    'Menu',
-                    style: TextStyle(
-                      color: secondary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Text(
+                  'Menu',
+                  style: TextStyle(
+                    color: secondary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, color: Colors.white),
-                  onPressed: () => Navigator.pop(context),
+                Container(
+                  width: 39, // Smaller width
+                  height: 39, // Smaller height
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: secondary,
+                  ),
+                  child: IconButton(
+                    icon: Icon(Icons.close, color:primary),
+                    onPressed: () => Navigator.pop(context),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             ListTile(
-              title:  Container(
-                decoration: BoxDecoration(color:secondary,borderRadius: BorderRadius.circular(15)),
+              title: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: secondary,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
                 child: Text(
                   'Add New Patient',
                   style: TextStyle(
@@ -61,24 +76,38 @@ class Menu extends StatelessWidget {
                   ),
                 ),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddPatientScreen(),
-                    ),
-                  );
-                },
+              trailing: Container(
+                width: 39, // Smaller width
+                height: 39, // Smaller height
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: secondary,
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.add_rounded, color: primary),
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    _showAddScreenDialog(context, 'addPatient');
+                  },
+                ),
               ),
             ),
             ListTile(
               title: Container(
-                decoration: BoxDecoration(color:secondary,borderRadius: BorderRadius.circular(15)),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: secondary,
+                  borderRadius: BorderRadius.circular(15),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 4,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
                 child: Text(
-                  'Add New report',
+                  'Add Staff',
                   style: TextStyle(
                     color: primary,
                     fontSize: 16,
@@ -86,17 +115,20 @@ class Menu extends StatelessWidget {
                   ),
                 ),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.add, color: Colors.white),
-                onPressed: () {
-                  Navigator.pop(context); // Close dialog
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const AddReport(),
-                    ),
-                  );
-                },
+              trailing: Container(
+                width: 39, // Smaller width
+                height: 39, // Smaller height
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: secondary,
+                ),
+                child: IconButton(
+                  icon:  Icon(Icons.add, color:primary),
+                  onPressed: () {
+                    Navigator.pop(context); // Close dialog
+                    _showAddScreenDialog(context, 'addStaff');
+                  },
+                ),
               ),
             ),
           ],
@@ -111,4 +143,41 @@ void showMenuDialog(BuildContext context) {
     context: context,
     builder: (context) => const Menu(),
   );
+}
+void _showAddScreenDialog(BuildContext context, String type) {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return Dialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(25),
+        ),
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.7,
+            maxWidth: MediaQuery.of(context).size.width,
+          ),
+          decoration: BoxDecoration(
+            color: const Color(0xff2C999B),
+            borderRadius: BorderRadius.circular(35),
+          ),
+          child: _buildAddScreenContent(type),
+        ),
+      );
+    },
+  );
+}
+Widget _buildAddScreenContent(String type) {
+  switch (type) {
+    case 'addPatient':
+      return const AddPatientScreen();
+    case 'addStaff':
+      return const AddStaffScreen();
+    default:
+      return const Center(child: Text('Invalid screen type'));
+  }
 }
