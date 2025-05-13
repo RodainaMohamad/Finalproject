@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/API_integration/services/DeletePatient_service.dart';
 import '../../API_integration/models/patientmodel.dart';
 import 'addreport.dart';
 
 class PatientCardWidget extends StatelessWidget {
   final Patient patient;
+  final int index;
+  final VoidCallback? onDeleted;
 
-  const PatientCardWidget({Key? key, required this.patient}) : super(key: key);
+  const PatientCardWidget({
+    Key? key,
+    required this.patient,
+    required this.index,
+    this.onDeleted,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
-        final cardWidth = screenWidth * 0.9; // Full width for GridView item
-        final cardHeight = cardWidth / 3.5; // Matches childAspectRatio: 3.5
+        final cardWidth = screenWidth * 0.9;
+        final cardHeight = cardWidth / 3.5;
 
         return Container(
           width: cardWidth,
@@ -24,13 +32,12 @@ class PatientCardWidget extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Padding(
-            padding: const EdgeInsets.all(6.0), // Reduced padding
+            padding: const EdgeInsets.all(6.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Profile Image
                 Container(
-                  width: cardHeight * 0.35, // Reduced size
+                  width: cardHeight * 0.35,
                   height: cardHeight * 0.35,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(3),
@@ -39,21 +46,19 @@ class PatientCardWidget extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(3),
                     child: Image.network(
-                      patient.profileImage,
+                      patient.profileImage ?? '',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
                       const Icon(Icons.person, color: Colors.white),
                     ),
                   ),
                 ),
-                const SizedBox(width: 6), // Reduced spacing
-                // Patient Info and Buttons
+                const SizedBox(width: 6),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Patient Name and SSN
                       Text(
                         patient.name ?? 'Unknown',
                         style: TextStyle(
@@ -74,13 +79,11 @@ class PatientCardWidget extends StatelessWidget {
                         maxLines: 1,
                       ),
                       const SizedBox(height: 3),
-                      // Buttons and Status
                       Expanded(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Buttons
                             Flexible(
                               child: Row(
                                 children: [
@@ -131,7 +134,10 @@ class PatientCardWidget extends StatelessWidget {
                                                     width: 1,
                                                   ),
                                                 ),
-                                                child: AddReport(),
+                                                child: AddReport(
+                                                  patientId:
+                                                  patient.id ?? index + 1,
+                                                ),
                                               ),
                                             );
                                           },
@@ -160,7 +166,6 @@ class PatientCardWidget extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Status Indicator
                             _buildPatientStatus(
                                 patient.status ?? 'Unknown', cardHeight * 0.25),
                           ],
@@ -170,15 +175,59 @@ class PatientCardWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 6),
-                // Popup Menu
                 PopupMenuButton<String>(
                   color: const Color(0xFF1E5A5E),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  onSelected: (value) {
+                  onSelected: (value) async {
                     if (value == 'delete') {
-                      // Implement delete functionality
+                      bool confirmDelete = await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Confirm Deletion'),
+                          content: Text(
+                              'Are you sure you want to delete ${patient.name}?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+
+                      if (confirmDelete) {
+                        try {
+                          final deleteService = DeletePatientService();
+                          const String token = "YOUR_AUTH_TOKEN_HERE";
+                          print('Deleting patient with ID: ${patient.id ?? index + 1}');
+                          await deleteService.deletePatient(
+                            patient.id ?? index + 1,
+                            token: token,
+                          );
+                          onDeleted?.call();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                              Text('${patient.name} deleted successfully'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        } catch (e) {
+                          print('Error in PatientCardWidget: $e');
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to delete patient: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
                     } else if (value == 'edit') {
                       // Implement edit functionality
                     }
@@ -206,7 +255,7 @@ class PatientCardWidget extends StatelessWidget {
                     ),
                   ],
                   child: SizedBox(
-                    width: cardHeight * 0.15, // Reduced size
+                    width: cardHeight * 0.15,
                     height: cardHeight * 0.25,
                     child: const Icon(
                       Icons.more_vert,

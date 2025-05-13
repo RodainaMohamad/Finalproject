@@ -14,20 +14,19 @@ class PatientsScreen extends StatefulWidget {
 class _PatientsScreenState extends State<PatientsScreen> {
   bool _isExpanded = false;
   final AddPatientService _patientService = AddPatientService();
-  List<Patient> _allPatients = []; // Store ALL patients
-  List<Patient> _displayedPatients = []; // Patients to display
+  List<Patient> _allPatients = [];
+  List<Patient> _displayedPatients = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadAllPatients(); // Load all patients initially
+    _loadAllPatients();
     Future.delayed(Duration.zero, () {
       setState(() => _isExpanded = true);
     });
 
-    // Listen to search input changes
     _searchController.addListener(() {
       _handleSearch(_searchController.text);
     });
@@ -36,14 +35,14 @@ class _PatientsScreenState extends State<PatientsScreen> {
   Future<void> _loadAllPatients() async {
     setState(() => _isLoading = true);
     try {
-      // Fetch all patients (assuming an endpoint exists or using empty name)
       final response = await _patientService.getPatientsByName('');
       _allPatients = response
           .asMap()
           .entries
           .map((entry) => Patient.fromAddPatientModel(entry.value, entry.key))
           .toList();
-      _displayedPatients = List.from(_allPatients); // Show all by default
+      _displayedPatients = List.from(_allPatients);
+      print('Loaded patients: ${_allPatients.map((p) => 'ID: ${p.id}, Name: ${p.name}').toList()}');
     } catch (e) {
       print('Error loading all patients: $e');
       _allPatients = [];
@@ -55,10 +54,8 @@ class _PatientsScreenState extends State<PatientsScreen> {
 
   void _handleSearch(String query) async {
     if (query.isEmpty) {
-      // Show all patients when search is empty
       setState(() => _displayedPatients = List.from(_allPatients));
     } else {
-      // Fetch patients by name from API
       setState(() => _isLoading = true);
       try {
         final response = await _patientService.getPatientsByName(query);
@@ -149,7 +146,8 @@ class _PatientsScreenState extends State<PatientsScreen> {
                   : _displayedPatients.isEmpty
                   ? const Center(child: Text('No patients found'))
                   : GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate:
+                const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
@@ -158,7 +156,25 @@ class _PatientsScreenState extends State<PatientsScreen> {
                 itemCount: _displayedPatients.length,
                 itemBuilder: (context, index) {
                   return PatientCardWidget(
-                      patient: _displayedPatients[index]);
+                    patient: _displayedPatients[index],
+                    index: index,
+                    onDeleted: () {
+                      setState(() {
+                        final patient = _displayedPatients[index];
+                        final patientId = patient.id ?? index + 1;
+                        print('Removing patient with ID: $patientId, Name: ${patient.name}');
+                        print('Before removal: _allPatients length: ${_allPatients.length}, _displayedPatients length: ${_displayedPatients.length}');
+                        _allPatients.removeWhere((p) => p.id == patientId || (p.id == null && p == patient));
+                        _displayedPatients.removeAt(index);
+                        print('After removal: _allPatients length: ${_allPatients.length}, _displayedPatients length: ${_displayedPatients.length}');
+                        // Optional: Refresh from API if removal seems incorrect
+                        if (_allPatients.any((p) => p.id == patientId)) {
+                          print('Patient still exists, refreshing from API');
+                          _loadAllPatients();
+                        }
+                      });
+                    },
+                  );
                 },
               ),
             ),
@@ -172,12 +188,12 @@ class _PatientsScreenState extends State<PatientsScreen> {
             builder: (context) {
               return AddPatientScreen(
                 onPatientAdded: (newPatient) {
-                  // Convert AddPatientModel to Patient and add to lists
                   setState(() {
                     final patient = Patient.fromAddPatientModel(
                         newPatient, _allPatients.length);
                     _allPatients.add(patient);
-                    _displayedPatients = List.from(_allPatients); // Update displayed list
+                    _displayedPatients = List.from(_allPatients);
+                    print('Added patient: ID: ${patient.id}, Name: ${patient.name}');
                   });
                 },
               );
@@ -187,7 +203,7 @@ class _PatientsScreenState extends State<PatientsScreen> {
         backgroundColor: Colors.white,
         child: const Icon(
           Icons.add,
-          color: Color(0xFF52B696A),
+          color: Color(0xFF52B696),
         ),
       ),
     );

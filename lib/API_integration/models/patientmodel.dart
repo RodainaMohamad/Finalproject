@@ -1,32 +1,47 @@
-import 'package:grad_project/API_integration/models/AddPatientModel.dart';
+import 'AddPatientModel.dart';
 
 class Patient {
-  final String? ssn;
+  final int? id;
   final String? name;
-  final String lastUpdate;
-  final String profileImage;
-  final String status;
+  final String? ssn;
+  final String? profileImage;
+  final String? status;
+  final int? reportId;
 
   Patient({
-    required this.ssn,
-    required this.name,
-    required this.lastUpdate,
-    required this.profileImage,
-    required this.status,
+    this.id,
+    this.name,
+    this.ssn,
+    this.profileImage,
+    this.status,
+    this.reportId,
   });
 
-  factory Patient.fromAddPatientModel(AddPatientModel model, int index) {
-    return Patient(
-      ssn: model.ssn,
-      name: model.name,
-      lastUpdate: '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}',
-      profileImage: 'https://via.placeholder.com/40',
-      status: _getRandomStatus(index),
-    );
-  }
-
-  static String _getRandomStatus(int index) {
-    final statuses = ['Very Good', 'Good', 'Bad', 'Very Bad'];
-    return statuses[index % statuses.length];
+  factory Patient.fromAddPatientModel(dynamic model, int index) {
+    if (model is AddPatientModel) {
+      // Handle AddPatientModel by accessing properties directly
+      return Patient(
+        id: model.id ?? index + 1,
+        name: model.name,
+        ssn: model.ssn,
+        profileImage: model.profileImage ?? '',
+        status: model.status,
+        reportId: model.reportId,
+      );
+    } else if (model is Map<String, dynamic>) {
+      // Handle Map<String, dynamic> (e.g., from API response)
+      return Patient(
+        id: model['id'] != null ? int.tryParse(model['id'].toString()) : index + 1,
+        name: model['name']?.toString(),
+        ssn: model['ssn']?.toString(),
+        profileImage: model['profileImage']?.toString() ?? '',
+        status: model['status']?.toString(),
+        reportId: model['reportId'] != null
+            ? int.tryParse(model['reportId'].toString())
+            : null,
+      );
+    } else {
+      throw Exception('Unsupported model type: ${model.runtimeType}');
+    }
   }
 }

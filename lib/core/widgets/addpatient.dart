@@ -4,7 +4,7 @@ import 'package:grad_project/API_integration/services/AddPatient_service.dart';
 import 'package:intl/intl.dart';
 
 class AddPatientScreen extends StatefulWidget {
-  final Function(AddPatientModel)? onPatientAdded; // Callback for new patient
+  final Function(AddPatientModel)? onPatientAdded;
 
   const AddPatientScreen({Key? key, this.onPatientAdded}) : super(key: key);
 
@@ -54,7 +54,7 @@ class _AddPatientScreenState extends State<AddPatientScreen>
   Future<void> _selectBirthDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now().subtract(Duration(days: 365 * 20)), // Fixed
+      initialDate: DateTime.now().subtract(Duration(days: 365 * 20)),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
     );
@@ -235,7 +235,7 @@ class _AddPatientScreenState extends State<AddPatientScreen>
                           String gender = _genderController.text.trim();
                           String phoneNumber = _phoneNumberController.text.trim();
                           String email = _emailController.text.trim();
-                          const String token = "YOUR_AUTH_TOKEN_HERE"; // Replace with actual token
+                          const String token = "YOUR_AUTH_TOKEN_HERE";
 
                           if (ssn.length < 13 || birthDate == null || name.isEmpty) {
                             showDialog(
@@ -324,7 +324,6 @@ class _AddPatientScreenState extends State<AddPatientScreen>
                                 email: email,
                                 token: token,
                               );
-                              // Trigger callback to notify parent
                               if (widget.onPatientAdded != null) {
                                 widget.onPatientAdded!(newPatient);
                               }
@@ -384,7 +383,7 @@ class _AddPatientScreenState extends State<AddPatientScreen>
                                         ElevatedButton(
                                           onPressed: () {
                                             Navigator.pop(context);
-                                            Navigator.pop(context); // Close AddPatientScreen
+                                            Navigator.pop(context);
                                           },
                                           style: ElevatedButton.styleFrom(
                                             backgroundColor: const Color(0xff2C999B),
