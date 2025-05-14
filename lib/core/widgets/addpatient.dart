@@ -236,7 +236,6 @@ class _AddPatientScreenState extends State<AddPatientScreen>
                           String phoneNumber = _phoneNumberController.text.trim();
                           String email = _emailController.text.trim();
                           const String token = "YOUR_AUTH_TOKEN_HERE";
-
                           if (ssn.length < 13 || birthDate == null || name.isEmpty) {
                             showDialog(
                               context: context,
@@ -313,7 +312,8 @@ class _AddPatientScreenState extends State<AddPatientScreen>
                                 );
                               },
                             );
-                          } else {
+                          }
+                          else {
                             try {
                               final newPatient = await _patientService.addPatient(
                                 name: name,

@@ -21,7 +21,6 @@ class _AddReportState extends State<AddReport> {
   final TextEditingController _reportDetailsController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _patientIDController = TextEditingController();
-  final TextEditingController _staffIDController = TextEditingController();
   final AddReportService _reportService = AddReportService();
   bool _isLoading = false;
   DateTime? _selectedDate;
@@ -32,7 +31,7 @@ class _AddReportState extends State<AddReport> {
     // Set default date to today
     _selectedDate = DateTime.now();
     _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-    // Set default patientId from widget (index + 1)
+    // Set patientId from widget
     _patientIDController.text = widget.patientId.toString();
   }
 
@@ -41,7 +40,6 @@ class _AddReportState extends State<AddReport> {
     _reportDetailsController.dispose();
     _dateController.dispose();
     _patientIDController.dispose();
-    _staffIDController.dispose();
     super.dispose();
   }
 
@@ -87,25 +85,15 @@ class _AddReportState extends State<AddReport> {
       _showErrorDialog('Please select a date');
       return;
     }
-    final patientId = int.tryParse(_patientIDController.text.trim());
-    if (patientId == null || patientId <= 0) {
-      _showErrorDialog('Please enter a valid patient ID');
-      return;
-    }
-    final staffID = int.tryParse(_staffIDController.text.trim());
-    if (staffID == null || staffID <= 0) {
-      _showErrorDialog('Please enter a valid staffID');
-      return;
-    }
 
     setState(() => _isLoading = true);
     try {
       const String token = "YOUR_AUTH_TOKEN_HERE"; // Replace with actual token
       final newReport = await _reportService.addReport(
         reportDetails: _reportDetailsController.text.trim(),
-        patientId: patientId,
+        patientId: widget.patientId, // Use widget.patientId directly
         uploadDate: _selectedDate!.toUtc().toIso8601String(),
-        medicalStaffId: null, // Replace with actual staff ID if available
+        medicalStaffId: null, // Staff ID not used
         token: token,
       );
 
@@ -353,36 +341,7 @@ class _AddReportState extends State<AddReport> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: _patientIDController,
-                      decoration: InputDecoration(
-                        filled: true,
-                        fillColor: const Color(0xFF2C6768),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 16,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(3),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 0.4,
-                          ),
-                        ),
-                      ),
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.number,
-                      maxLines: 1,
-                    ),
-                    const SizedBox(height: 10),
-                    const Text(
-                      'Staff ID:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextField(
-                      controller: _patientIDController,
+                      readOnly: true, // Prevent editing
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),
