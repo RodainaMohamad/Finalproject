@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
     ],
     child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: "DoctortHome",
+      initialRoute: "Signin",
       routes: {
         'Splashscreen': (context) => const Splashscreen(),
         'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         'DoctorPatient': (context) =>const DoctorPatient(),
         'PatientHome': (context) => const PatientHome(),
         'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
-        'DoctortHome':(context)=>const Doctorhome(),
+        'DoctortHome':(context)=>const Doctorhome(doctorName: 'Unknown',),
       },
     ));
   }

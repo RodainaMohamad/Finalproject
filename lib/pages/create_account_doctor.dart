@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:grad_project/core/widgets/SecondDoctorScreen.dart';
 import 'package:grad_project/core/widgets/first_screen.dart';
 import 'package:grad_project/core/widgets/thank_you.dart';
+import 'package:grad_project/pages/Doctorhome.dart';
 
 class CreateAccountScreenDoctor extends StatefulWidget {
   static const String routeName = 'CreateAccountScreenDoctor';
+
+  const CreateAccountScreenDoctor({super.key});
 
   @override
   _CreateAccountScreenState createState() => _CreateAccountScreenState();
@@ -33,12 +36,26 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
     setState(() {
       showThankYou = true;
     });
+
+    // Display ThankYou screen for 3 seconds, then navigate to Doctorhome
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Doctorhome(
+              doctorName: fullName ?? 'Unknown', // Pass fullName
+            ),
+          ),
+        );
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0XFF5DC1C3),
+      backgroundColor: const Color(0xFF5DC1C3),
       body: Stack(
         children: [
           Column(
@@ -47,18 +64,18 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
                 child: showThankYou
                     ? const ThankYou()
                     : IndexedStack(
-                        index: currentIndex,
-                        children: [
-                          FirstScreen(onContinue: navigateToSecondScreen),
-                          SecondDoctorScreen(
-                            onDone: showThankYouScreen,
-                            email: email ?? '',
-                            fullName: fullName ?? '',
-                            password: password ?? '',
-                            confirmPassword: confirmPassword ?? '',
-                          ),
-                        ],
-                      ),
+                  index: currentIndex,
+                  children: [
+                    FirstScreen(onContinue: navigateToSecondScreen),
+                    SecondDoctorScreen(
+                      onDone: showThankYouScreen,
+                      email: email ?? '',
+                      fullName: fullName ?? '',
+                      password: password ?? '',
+                      confirmPassword: confirmPassword ?? '',
+                    ),
+                  ],
+                ),
               ),
               if (!showThankYou)
                 Padding(
@@ -94,7 +111,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenDoctor> {
                   });
                 }
               },
-              backgroundColor: const Color(0XFF5DC1C3),
+              backgroundColor: const Color(0xFF5DC1C3),
               foregroundColor: Colors.white,
               shape: const CircleBorder(),
               child: const Icon(

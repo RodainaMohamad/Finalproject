@@ -2,28 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/DoctorMenu.dart';
-import '../core/widgets/HomeBottomBar.dart';
-import '../core/widgets/patienScrean.dart';
-import '../core/widgets/patientSection.dart';
-import '../core/widgets/patientstatus.dart';
-import '../core/widgets/staffcection.dart';
-import '../core/widgets/staffscrean.dart';
+import 'package:grad_project/core/widgets/HomeBottomBar.dart';
+import 'package:grad_project/core/widgets/patienScrean.dart';
+import 'package:grad_project/core/widgets/patientSection.dart';
+import 'package:grad_project/core/widgets/patientstatus.dart';
+import 'package:grad_project/core/widgets/staffcection.dart';
+import 'package:grad_project/core/widgets/staffscrean.dart';
 
 class Doctorhome extends StatelessWidget {
   static const String routeName = 'DoctortHome';
-  const Doctorhome({super.key});
+  final String doctorName; // Added parameter
+
+  const Doctorhome({super.key, required this.doctorName}); // Updated constructor
 
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final icons = [
-      //Icons.message_rounded,
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
     ];
     final routes = [
-     // '/messages',
       '/menu',
       '/notifications',
     ];
@@ -52,7 +52,7 @@ class Doctorhome extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    //logo + divider
+                    // Logo + divider
                     Row(
                       children: [
                         Expanded(
@@ -83,7 +83,7 @@ class Doctorhome extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        // Text section (Welcome, Mohamed Ahmed)
+                        // Text section (Welcome, Doctor Name)
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -98,7 +98,7 @@ class Doctorhome extends StatelessWidget {
                               textAlign: TextAlign.right,
                             ),
                             Text(
-                              "Dr/Mohamed Ahmed ...",
+                              "Dr/${doctorName.isEmpty ? 'Unknown' : doctorName} ...", // Dynamic name
                               style: GoogleFonts.nunito(
                                 fontSize: 10,
                                 height: 1.4,
@@ -114,7 +114,7 @@ class Doctorhome extends StatelessWidget {
                         CircleAvatar(
                           radius: width * 0.07,
                           backgroundImage:
-                              const AssetImage("assets/patientAvatar.png"),
+                          const AssetImage("assets/patientAvatar.png"),
                         ),
                         SizedBox(width: width * 0.1),
                         // Icons section
@@ -147,7 +147,7 @@ class Doctorhome extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  if (index == 2 && hasNotification)
+                                  if (index == 1 && hasNotification)
                                     Positioned(
                                       bottom: width * 0.02,
                                       right: width * 0.02,
@@ -188,58 +188,59 @@ class Doctorhome extends StatelessWidget {
       ),
     );
   }
-}
 
-void _showCustomScreenDialog(BuildContext context, String type) {
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return Dialog(
-        insetPadding: const EdgeInsets.symmetric(
-          horizontal: 20,
-          vertical: 24,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-        backgroundColor: Colors.transparent,
-        child: Container(
-          width: double.infinity,
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.7,
-            maxWidth: MediaQuery.of(context).size.width,
+  void _showCustomScreenDialog(BuildContext context, String type) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
           ),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(255, 255, 255, 0.1),
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(25),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Flexible(
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(16),
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: double.infinity,
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
+              maxWidth: MediaQuery.of(context).size.width,
+            ),
+            decoration: BoxDecoration(
+              color: const Color.fromRGBO(255, 255, 255, 0.1),
+              borderRadius: BorderRadius.circular(25),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(16),
+                    ),
+                    child: _buildCustomScreenContent(type),
                   ),
-                  child: _buildCustomScreenContent(type),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
-Widget _buildCustomScreenContent(String type) {
-  switch (type) {
-    case 'patients':
-      return const PatientsScreen();
-    case 'staff':
-      return const StaffScreen();
-    default:
-      return const Center(child: Text('Invalid screen type'));
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomScreenContent(String type) {
+    switch (type) {
+      case 'patients':
+        return const PatientsScreen();
+      case 'staff':
+        return const StaffScreen();
+      default:
+        return const Center(child: Text('Invalid screen type'));
+    }
   }
 }
