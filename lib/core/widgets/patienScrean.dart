@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:grad_project/API_integration/models/PatientByIdModel.dart';
 import 'package:grad_project/API_integration/models/patientmodel.dart';
-import 'package:grad_project/API_integration/services/AddPatient_service.dart';
+import 'package:grad_project/API_integration/services/PatientByIdService.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:grad_project/core/widgets/patiencard.dart';
 import 'addpatient.dart';
 
@@ -11,74 +14,142 @@ class PatientsScreen extends StatefulWidget {
   State<PatientsScreen> createState() => _PatientsScreenState();
 }
 
-class _PatientsScreenState extends State<PatientsScreen> {
+class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObserver {
   bool _isExpanded = false;
-  final AddPatientService _patientService = AddPatientService();
-  List<Patient> _allPatients = [];
-  List<Patient> _displayedPatients = [];
+  final PatientByIdService _patientService = PatientByIdService();
+  List<PatientByIdModel> _allPatients = [];
+  List<PatientByIdModel> _displayedPatients = [];
   final TextEditingController _searchController = TextEditingController();
   bool _isLoading = true;
+  bool _prefsError = false;
+  late SharedPreferences _prefs;
+  bool _prefsInitialized = false;
+  List<int> _knownPatientIds = []; // Track known patient IDs
 
   @override
   void initState() {
     super.initState();
-    _loadAllPatients();
-    Future.delayed(Duration.zero, () {
-      setState(() => _isExpanded = true);
-    });
+    WidgetsBinding.instance.addObserver(this);
+    _initializeApp();
+    Future.delayed(Duration.zero, () => setState(() => _isExpanded = true));
+    _searchController.addListener(() => _handleSearch(_searchController.text));
+  }
 
-    _searchController.addListener(() {
-      _handleSearch(_searchController.text);
-    });
+  Future<void> _initializeApp() async {
+    await _initSharedPreferences();
+    await _loadKnownPatientIds(); // Load previously known IDs
+    await _loadAllPatients(); // Load all patients
+  }
+
+  Future<void> _initSharedPreferences() async {
+    try {
+      _prefs = await SharedPreferences.getInstance();
+      setState(() => _prefsInitialized = true);
+    } catch (e) {
+      print('Error initializing SharedPreferences: $e');
+      setState(() => _prefsInitialized = false);
+    }
+  }
+
+  Future<void> _loadKnownPatientIds() async {
+    if (!_prefsInitialized) return;
+
+    try {
+      final ids = _prefs.getStringList('knownPatientIds');
+      if (ids != null) {
+        setState(() {
+          _knownPatientIds = ids.map(int.parse).toList();
+        });
+      }
+    } catch (e) {
+      print('Error loading known patient IDs: $e');
+    }
   }
 
   Future<void> _loadAllPatients() async {
     setState(() => _isLoading = true);
+
     try {
-      final response = await _patientService.getPatientsByName('');
-      _allPatients = response
-          .asMap()
-          .entries
-          .map((entry) => Patient.fromAddPatientModel(entry.value, entry.key))
-          .toList();
-      _displayedPatients = List.from(_allPatients);
-      print('Loaded patients: ${_allPatients.map((p) => 'ID: ${p.id}, Name: ${p.name}').toList()}');
+      List<PatientByIdModel> loadedPatients = [];
+      List<int> successfulIds = [];
+
+      // Try loading each known patient
+      for (int id in _knownPatientIds) {
+        try {
+          final patient = await _patientService.getPatientById(id);
+          loadedPatients.add(patient);
+          successfulIds.add(id);
+          print('Successfully loaded patient $id');
+        } catch (e) {
+          print('Error loading patient $id: $e');
+        }
+      }
+
+      // Check for new patients by trying incremental IDs
+      int nextId = _knownPatientIds.isEmpty ? 1 : (_knownPatientIds.reduce((a, b) => a > b ? a : b) + 1);
+      int newPatientsFound = 0;
+
+      // Limit to checking 10 new possible IDs to avoid infinite loops
+      for (int i = 0; i < 10; i++) {
+        try {
+          final patient = await _patientService.getPatientById(nextId + i);
+          loadedPatients.add(patient);
+          successfulIds.add(patient.id!);
+          newPatientsFound++;
+          print('Discovered new patient ${patient.id}');
+        } catch (e) {
+          // Expected when patient doesn't exist
+        }
+      }
+      setState(() {
+        _allPatients = loadedPatients;
+        _displayedPatients = List.from(_allPatients);
+        _knownPatientIds = successfulIds.toSet().toList(); // Ensure unique IDs
+      });
+
+      if (_prefsInitialized) {
+        await _prefs.setStringList('knownPatientIds',
+            _knownPatientIds.map((id) => id.toString()).toList());
+        await _savePatientsLocally();
+      }
+
+      if (newPatientsFound > 0) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Found $newPatientsFound new patients')));
+      }
     } catch (e) {
       print('Error loading all patients: $e');
-      _allPatients = [];
-      _displayedPatients = [];
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error loading patients. Showing cached data.'))
+      );
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
-  void _handleSearch(String query) async {
-    if (query.isEmpty) {
-      setState(() => _displayedPatients = List.from(_allPatients));
-    } else {
-      setState(() => _isLoading = true);
-      try {
-        final response = await _patientService.getPatientsByName(query);
-        setState(() {
-          _displayedPatients = response
-              .asMap()
-              .entries
-              .map((entry) => Patient.fromAddPatientModel(entry.value, entry.key))
-              .toList();
-        });
-      } catch (e) {
-        print('Error searching patients: $e');
-        setState(() => _displayedPatients = []);
-      } finally {
-        setState(() => _isLoading = false);
-      }
+  Future<void> _savePatientsLocally() async {
+    if (!_prefsInitialized) return;
+
+    try {
+      final patientsJson = _allPatients.map((p) => jsonEncode(p.toJson())).toList();
+      await _prefs.setStringList('patients', patientsJson);
+    } catch (e) {
+      print('Error saving patients locally: $e');
+      setState(() => _prefsError = true);
     }
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  void _handleSearch(String query) {
+    if (query.isEmpty) {
+      setState(() => _displayedPatients = List.from(_allPatients));
+    } else {
+      setState(() {
+        _displayedPatients = _allPatients
+            .where((patient) =>
+        patient.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
+            .toList();
+      });
+    }
   }
 
   @override
@@ -97,6 +168,14 @@ class _PatientsScreenState extends State<PatientsScreen> {
         ),
         child: Column(
           children: [
+            if (_prefsError)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  'Local storage unavailable. Data may not persist between sessions.',
+                  style: TextStyle(color: Colors.red[200]),
+                ),
+              ),
             const Row(
               children: [
                 Expanded(
@@ -144,38 +223,56 @@ class _PatientsScreenState extends State<PatientsScreen> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _displayedPatients.isEmpty
-                  ? const Center(child: Text('No patients found'))
-                  : GridView.builder(
-                gridDelegate:
-                const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 1,
-                  crossAxisSpacing: 10,
-                  mainAxisSpacing: 10,
-                  childAspectRatio: itemAspectRatio,
+                  ? Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('No patients found'),
+                    ElevatedButton(
+                      onPressed: _loadAllPatients,
+                      child: Text('Retry'),
+                    ),
+                  ],
                 ),
-                itemCount: _displayedPatients.length,
-                itemBuilder: (context, index) {
-                  return PatientCardWidget(
-                    patient: _displayedPatients[index],
-                    index: index,
-                    onDeleted: () {
-                      setState(() {
-                        final patient = _displayedPatients[index];
-                        final patientId = patient.id ?? index + 1;
-                        print('Removing patient with ID: $patientId, Name: ${patient.name}');
-                        print('Before removal: _allPatients length: ${_allPatients.length}, _displayedPatients length: ${_displayedPatients.length}');
-                        _allPatients.removeWhere((p) => p.id == patientId || (p.id == null && p == patient));
-                        _displayedPatients.removeAt(index);
-                        print('After removal: _allPatients length: ${_allPatients.length}, _displayedPatients length: ${_displayedPatients.length}');
-                        // Optional: Refresh from API if removal seems incorrect
-                        if (_allPatients.any((p) => p.id == patientId)) {
-                          print('Patient still exists, refreshing from API');
-                          _loadAllPatients();
+              )
+                  : RefreshIndicator(
+                onRefresh: _loadAllPatients,
+                child: GridView.builder(
+                  gridDelegate:
+                  const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 1,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: itemAspectRatio,
+                  ),
+                  itemCount: _displayedPatients.length,
+                  itemBuilder: (context, index) {
+                    final patient = _displayedPatients[index];
+                    return PatientCardWidget(
+                      patient: Patient(
+                        id: patient.id,
+                        name: patient.name,
+                        ssn: patient.ssn,
+                        profileImage: patient.profileImage,
+                        status: patient.status,
+                        reportId: patient.reportId,
+                      ),
+                      index: index,
+                      onDeleted: () async {
+                        setState(() {
+                          _allPatients.removeWhere((p) => p.id == patient.id);
+                          _displayedPatients = List.from(_allPatients);
+                          _knownPatientIds.remove(patient.id);
+                        });
+                        if (_prefsInitialized) {
+                          await _savePatientsLocally();
+                          await _prefs.setStringList('knownPatientIds',
+                              _knownPatientIds.map((id) => id.toString()).toList());
                         }
-                      });
-                    },
-                  );
-                },
+                      },
+                    );
+                  },
+                ),
               ),
             ),
           ],
@@ -185,17 +282,36 @@ class _PatientsScreenState extends State<PatientsScreen> {
         onPressed: () {
           showModalBottomSheet(
             context: context,
+            isScrollControlled: true,
             builder: (context) {
-              return AddPatientScreen(
-                onPatientAdded: (newPatient) {
-                  setState(() {
-                    final patient = Patient.fromAddPatientModel(
-                        newPatient, _allPatients.length);
-                    _allPatients.add(patient);
-                    _displayedPatients = List.from(_allPatients);
-                    print('Added patient: ID: ${patient.id}, Name: ${patient.name}');
-                  });
-                },
+              return Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
+                child: AddPatientScreen(
+                  onPatientAdded: (newPatient) async {
+                    // First add to local state
+                    setState(() {
+                      final patient = PatientByIdModel.fromJson(newPatient.toJson());
+                      _allPatients.add(patient);
+                      _displayedPatients = List.from(_allPatients);
+                      if (patient.id != null && !_knownPatientIds.contains(patient.id)) {
+                        _knownPatientIds.add(patient.id!);
+                      }
+                    });
+
+                    // Then save locally
+                    if (_prefsInitialized) {
+                      await _savePatientsLocally();
+                      await _prefs.setStringList('knownPatientIds',
+                          _knownPatientIds.map((id) => id.toString()).toList());
+                    }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Patient added successfully!'))
+                    );
+                  },
+                ),
               );
             },
           );
@@ -207,5 +323,12 @@ class _PatientsScreenState extends State<PatientsScreen> {
         ),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _searchController.dispose();
+    super.dispose();
   }
 }

@@ -19,7 +19,6 @@ class Patient {
 
   factory Patient.fromAddPatientModel(dynamic model, int index) {
     if (model is AddPatientModel) {
-      // Handle AddPatientModel by accessing properties directly
       return Patient(
         id: model.id ?? index + 1,
         name: model.name,
@@ -29,7 +28,6 @@ class Patient {
         reportId: model.reportId,
       );
     } else if (model is Map<String, dynamic>) {
-      // Handle Map<String, dynamic> (e.g., from API response)
       return Patient(
         id: model['id'] != null ? int.tryParse(model['id'].toString()) : index + 1,
         name: model['name']?.toString(),
