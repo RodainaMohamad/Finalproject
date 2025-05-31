@@ -22,6 +22,7 @@ class _AddReportState extends State<AddReport> {
   final TextEditingController _dateController = TextEditingController();
   final TextEditingController _patientIDController = TextEditingController();
   final AddReportService _reportService = AddReportService();
+
   bool _isLoading = false;
   DateTime? _selectedDate;
 
@@ -42,7 +43,7 @@ class _AddReportState extends State<AddReport> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    final picked = await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime(2000),
@@ -85,6 +86,7 @@ class _AddReportState extends State<AddReport> {
     }
 
     setState(() => _isLoading = true);
+
     try {
       final newReport = await _reportService.addReport(
         reportDetails: _reportDetailsController.text.trim(),
@@ -147,9 +149,7 @@ class _AddReportState extends State<AddReport> {
                 ),
                 const SizedBox(height: 24),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
+                  onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff2C999B),
                     padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -159,10 +159,7 @@ class _AddReportState extends State<AddReport> {
                   ),
                   child: const Text(
                     'Done',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(color: Colors.white, fontSize: 16),
                   ),
                 ),
               ],
@@ -215,16 +212,11 @@ class _AddReportState extends State<AddReport> {
               Text(
                 message,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Colors.black54,
-                ),
+                style: const TextStyle(fontSize: 16, color: Colors.black54),
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
+                onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff2C999B),
                   padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
@@ -234,10 +226,7 @@ class _AddReportState extends State<AddReport> {
                 ),
                 child: const Text(
                   'Retry',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+                  style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),
             ],
@@ -279,23 +268,15 @@ class _AddReportState extends State<AddReport> {
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(
-                            Icons.close,
-                            color: Colors.white,
-                          ),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
+                          icon: const Icon(Icons.close, color: Colors.white),
+                          onPressed: () => Navigator.pop(context),
                         ),
                       ],
                     ),
                     const SizedBox(height: 5),
                     const Text(
                       'Date',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 4),
                     TextField(
@@ -304,21 +285,12 @@ class _AddReportState extends State<AddReport> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 16,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(3),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 0.4,
-                          ),
+                          borderSide: const BorderSide(color: Colors.white, width: 0.4),
                         ),
-                        suffixIcon: const Icon(
-                          Icons.calendar_today,
-                          color: Colors.white,
-                        ),
+                        suffixIcon: const Icon(Icons.calendar_today, color: Colors.white),
                       ),
                       style: const TextStyle(color: Colors.white),
                       onTap: () => _selectDate(context),
@@ -326,10 +298,7 @@ class _AddReportState extends State<AddReport> {
                     const SizedBox(height: 10),
                     const Text(
                       'Patient ID:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -338,16 +307,10 @@ class _AddReportState extends State<AddReport> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 16,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(3),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 0.4,
-                          ),
+                          borderSide: const BorderSide(color: Colors.white, width: 0.4),
                         ),
                       ),
                       style: const TextStyle(color: Colors.white),
@@ -357,10 +320,7 @@ class _AddReportState extends State<AddReport> {
                     const SizedBox(height: 10),
                     const Text(
                       'Report:',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 8),
                     TextField(
@@ -368,16 +328,10 @@ class _AddReportState extends State<AddReport> {
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),
-                        contentPadding: const EdgeInsets.symmetric(
-                          vertical: 20,
-                          horizontal: 16,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(3),
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 0.4,
-                          ),
+                          borderSide: const BorderSide(color: Colors.white, width: 0.4),
                         ),
                       ),
                       style: const TextStyle(color: Colors.white),
@@ -389,20 +343,19 @@ class _AddReportState extends State<AddReport> {
                         onPressed: _isLoading ? null : _submitReport,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          minimumSize: const Size(170, 44),
+                          minimumSize: const Size(160, 50),
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(9),
+                            borderRadius: BorderRadius.circular(25),
                           ),
                         ),
                         child: _isLoading
-                            ? const CircularProgressIndicator(
-                          color: Color(0xff2C999B),
-                        )
+                            ? const CircularProgressIndicator(color: Color(0xff2C999B))
                             : const Text(
                           'Add Report',
                           style: TextStyle(
                             color: Color(0xff2C999B),
-                            fontSize: 16,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),

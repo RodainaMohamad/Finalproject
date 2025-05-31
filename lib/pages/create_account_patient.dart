@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/widgets/SecondPatientScreen.dart';
 import 'package:grad_project/core/widgets/first_screen.dart';
 import 'package:grad_project/core/widgets/thank_you.dart';
@@ -37,25 +36,20 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
     setState(() {
       showThankYou = true;
     });
+
     await Future.delayed(const Duration(seconds: 3));
+
     if (mounted) {
-      final patientId = await AuthUtils.getPatientId();
-      final patientName = await AuthUtils.getPatientName();
-      if (patientId != null) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => PatientHome(
-              patientName: patientName ?? 'Unknown',
-              patientId: int.parse(patientId),
-            ),
+      // ✅ Navigate directly to PatientHome without checking for ID or name
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const PatientHome(
+            patientName: 'Patient', // or any default/static value
+            patientId: 0, // You can set 0 or -1 as a placeholder
           ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error: Patient ID not found')),
-        );
-      }
+        ),
+      );
     }
   }
 
