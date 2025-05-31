@@ -12,10 +12,16 @@ class LoginService {
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          'twoFactorCode': '',
+          'twoFactorRecoveryCode': ''
+        }),
       );
 
-      print("API Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body}");
+      print(
+          "API Response: Status=${response.statusCode}, Body=${response.body}");
 
       if (response.statusCode == 200) {
         if (response.body.isEmpty) {
@@ -24,11 +30,9 @@ class LoginService {
 
         final dynamic decodedData = jsonDecode(response.body);
 
-        // Check if decodedData is a Map and safely convert to Map<String, dynamic>
         if (decodedData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(decodedData);
-
-          print("DEBUG: Data after jsonDecode and type conversion in LoginService: $data");
+          final Map<String, dynamic> data = Map<String, dynamic>.from(
+              decodedData);
 
           final String? accessToken = data['accessToken'] as String?;
           final String? refreshToken = data['refreshToken'] as String?;
@@ -44,7 +48,9 @@ class LoginService {
             'tokenType': tokenType,
           };
         } else {
-          throw Exception('Login API returned unexpected data format: ${decodedData.runtimeType}. Expected Map.');
+          throw Exception(
+              'Login API returned unexpected data format: ${decodedData
+                  .runtimeType}. Expected Map.');
         }
       } else {
         String errorMessage = 'Failed to login: ${response.statusCode}';
@@ -56,7 +62,8 @@ class LoginService {
             errorMessage += ' - $errorBody';
           }
         } catch (e) {
-          print('Warning: Could not parse error response body: ${response.body}');
+          print(
+              'Warning: Could not parse error response body: ${response.body}');
         }
         throw Exception(errorMessage);
       }

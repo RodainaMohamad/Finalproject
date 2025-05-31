@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grad_project/API_integration/models/GetReportModel.dart';
-import 'package:grad_project/API_integration/services/GetReport_service.dart';
+import 'package:grad_project/API_integration/models/PatientDetailsModel.dart';
+import 'package:grad_project/API_integration/services/PatientDetails_service.dart';
+import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
 import 'package:grad_project/core/widgets/HomeBottomBar.dart';
@@ -108,7 +109,7 @@ class _PatientHomeState extends State<PatientHome> {
                             textAlign: TextAlign.right,
                           ),
                           Text(
-                            "${widget.patientName.isEmpty ? 'Unknown' : widget.patientName} ...",
+                            "${widget.patientName}...",
                             style: GoogleFonts.nunito(
                               fontSize: 10,
                               height: 1.4,
@@ -264,28 +265,45 @@ class _PatientHomeState extends State<PatientHome> {
                         ),
                       ),
                       SizedBox(height: height * 0.03),
-                      FutureBuilder(
-                        future: GetReportService().getReports(widget.patientId),
+                      // In PatientHome.dart (partial)
+                      FutureBuilder<PatientDetailsModel>(
+                        future: PatientDetailsService().getPatientDetails(widget.patientId),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const CustomExpansionTile(title: "My Diagnoses", content: "Loading...");
                           } else if (snapshot.hasError) {
+                            final error = snapshot.error.toString();
+                            if (error.contains('401')) {
+                              return CustomExpansionTile(
+                                title: "My Diagnoses",
+                                content: "Session expired. Please log in again.",
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.login),
+                                  onPressed: () {
+                                    AuthUtils.clearToken();
+                                    Navigator.pushReplacementNamed(context, 'Signin');
+                                  },
+                                ),
+                              );
+                            }
                             return CustomExpansionTile(
                               title: "My Diagnoses",
-                              content: snapshot.error.toString().contains('404')
-                                  ? "No reports found for this patient."
-                                  : "Error: ${snapshot.error}",
+                              content: error.contains('404') ? "No reports found." : "Error: $error",
                               trailing: IconButton(
                                 icon: const Icon(Icons.refresh),
                                 onPressed: () => setState(() {}),
                               ),
                             );
-                          } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
-                            return const CustomExpansionTile(title: "My Diagnoses", content: "No diagnosis found.");
+                          } else if (!snapshot.hasData || snapshot.data!.reports == null || snapshot.data!.reports!.isEmpty) {
+                            return const CustomExpansionTile(title: "My Diagnoses", content: "No reports found.");
                           } else {
-                            final reports = snapshot.data as List<GetReportModel>;
-                            final content = reports.map((e) => "• ${e.reportDetails}").join("\n\n");
-                            return CustomExpansionTile(title: "My Diagnoses", content: content);
+                            final reports = snapshot.data!.reports!;
+                            return CustomExpansionTile(
+                              title: "My Diagnoses",
+                              content: reports
+                                  .map((report) => "• ${report.reportDetails}\n  Date: ${report.uploadDate?.split('T').first ?? 'Unknown'}")
+                                  .join("\n"),
+                            );
                           }
                         },
                       ),

@@ -6,9 +6,9 @@ class AddPatientModel {
   String? gender;
   String? phoneNumber;
   String? email;
-  String? profileImage; // Added for consistency with Patient
-  String? status; // Added for consistency with Patient
-  int? reportId; // Added for consistency with Patient
+  String? profileImage;
+  String? status;
+  int? reportId;
 
   AddPatientModel({
     this.id,

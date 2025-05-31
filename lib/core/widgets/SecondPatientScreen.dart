@@ -1,18 +1,16 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:intl/intl.dart';
 
-class SecondScreen extends StatefulWidget {
+class SecondPatientScreen extends StatefulWidget {
   final VoidCallback onDone;
   final String email;
   final String fullName;
   final String password;
   final String confirmPassword;
 
-  const SecondScreen({
+  const SecondPatientScreen({
     super.key,
     required this.onDone,
     required this.email,
@@ -22,22 +20,23 @@ class SecondScreen extends StatefulWidget {
   });
 
   @override
-  State<SecondScreen> createState() => _SecondScreenState();
+  State<SecondPatientScreen> createState() => _SecondPatientScreenState();
 }
 
-class _SecondScreenState extends State<SecondScreen> {
+class _SecondPatientScreenState extends State<SecondPatientScreen> {
   final _formKeySecondScreen = GlobalKey<FormState>();
   final TextEditingController nameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
   final TextEditingController nationalIdController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
   String? selectedGender;
+
   final RegisterService _registerService = RegisterService();
 
   Future<void> registerUser() async {
     if (_formKeySecondScreen.currentState!.validate()) {
       try {
-        final registerModel = RegisterModel(
+        final response = await _registerService.register(
           fullName: nameController.text.isNotEmpty
               ? nameController.text
               : widget.fullName,
@@ -46,32 +45,23 @@ class _SecondScreenState extends State<SecondScreen> {
           dateOfBirth: birthDateController.text,
           nationalId: nationalIdController.text,
           phoneNumber: phoneNumberController.text,
-          userType: 'patient',
-          password: widget.password,
-          confirmPassword: widget.confirmPassword,
-          specialty: ""
-        );
-        print('Request Body: ${jsonEncode(registerModel.toJson())}');
-        RegisterModel response = await _registerService.register(
-          fullName: nameController.text.isNotEmpty
-              ? nameController.text
-              : widget.fullName,
-          email: widget.email,
-          gender: selectedGender ?? 'M',
-          dateOfBirth: birthDateController.text,
-          nationalId: nationalIdController.text,
-          phoneNumber: phoneNumberController.text,
-          userType: 'patient',
-          specialty: "",
+          userType: 'Patient',
           password: widget.password,
           confirmPassword: widget.confirmPassword,
         );
-        widget.onDone();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful! Please login.')),
+          );
+          widget.onDone();
+        }
       } catch (e) {
         debugPrint('Failed to register: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to register: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to register: $e')),
+          );
+        }
       }
     }
   }
@@ -102,13 +92,11 @@ class _SecondScreenState extends State<SecondScreen> {
                   'Create Your Account (Patient)',
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: secondary,
-                  ),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: secondary),
                 ),
                 const SizedBox(height: 20),
-
                 TextFormField(
                   controller: nameController,
                   decoration: InputDecoration(
@@ -127,7 +115,6 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
-
                 TextFormField(
                   controller: birthDateController,
                   decoration: InputDecoration(
@@ -142,12 +129,11 @@ class _SecondScreenState extends State<SecondScreen> {
                     DateTime? data = await showDatePicker(
                       context: context,
                       initialDate: DateTime.now(),
-                      firstDate: DateTime(1900),
+                      firstDate: DateTime(1990),
                       lastDate: DateTime(2100),
                     );
                     if (data != null) {
-                      var formatter =
-                          DateFormat('yyyy-MM-dd'); // Use ISO 8601 format.
+                      var formatter = DateFormat('yyyy-MM-dd');
                       birthDateController.text = formatter.format(data);
                     }
                   },
@@ -156,7 +142,7 @@ class _SecondScreenState extends State<SecondScreen> {
                       return 'Please select your birthdate';
                     }
                     try {
-                      DateTime.parse(value); // Validate date format.
+                      DateTime.parse(value);
                     } catch (e) {
                       return 'Invalid date format';
                     }
@@ -164,7 +150,6 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -186,7 +171,6 @@ class _SecondScreenState extends State<SecondScreen> {
                           child: const Text('M'),
                         ),
                         const SizedBox(width: 10),
-                        // Button for selecting Female.
                         ElevatedButton(
                           onPressed: () => setState(() => selectedGender = 'F'),
                           style: ElevatedButton.styleFrom(
@@ -205,7 +189,6 @@ class _SecondScreenState extends State<SecondScreen> {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Text field for National ID.
                 TextFormField(
                   controller: nationalIdController,
                   decoration: InputDecoration(
@@ -224,7 +207,6 @@ class _SecondScreenState extends State<SecondScreen> {
                   },
                 ),
                 const SizedBox(height: 10),
-                // Text field for Phone Number.
                 TextFormField(
                   controller: phoneNumberController,
                   decoration: InputDecoration(
@@ -242,8 +224,7 @@ class _SecondScreenState extends State<SecondScreen> {
                     return null;
                   },
                 ),
-                const SizedBox(height: 10),
-                // Button to submit the form.
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: registerUser,
                   style: ElevatedButton.styleFrom(

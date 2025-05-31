@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/API_integration/services/login_service.dart';
+import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
 
 class Signin extends StatefulWidget {
   static const String routeName = 'Signin';
-
   const Signin({super.key});
-
   @override
   _Signin createState() => _Signin();
 }
@@ -27,10 +26,9 @@ class _Signin extends State<Signin> {
   void _updateBorder(String button) {
     setState(() {
       if (button == 'Login') {
-        yesBorderColor = primary; // Assuming primary is defined in colours.dart
+        yesBorderColor = primary;
         noBorderColor = secondary;
-      }
-      else {
+      } else {
         noBorderColor = primary;
         yesBorderColor = secondary;
       }
@@ -52,11 +50,23 @@ class _Signin extends State<Signin> {
       debugPrint('DEBUG: Login successful. Raw loginResponse: $loginResponse');
 
       if (loginResponse['accessToken'] != null) {
+        await AuthUtils.saveToken(loginResponse['accessToken']);
+        if (loginResponse['refreshToken'] != null) {
+          await AuthUtils.saveRefreshToken(loginResponse['refreshToken']);
+        }
+
+        final patientId = await AuthUtils.getPatientId();
+        final patientName = await AuthUtils.getPatientName();
+
+        if (patientId == null) {
+          throw Exception('No patient ID found. Please register again.');
+        }
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Login successful! Access token received. Fetching user details...',
+                'Login successful! Welcome ${patientName ?? 'User'}',
                 style: TextStyle(color: primary),
               ),
               backgroundColor: secondary,
@@ -64,34 +74,17 @@ class _Signin extends State<Signin> {
             ),
           );
 
-          // TODO: Implement a separate API call here to fetch user details (userType, userId, userName)
-          // For example:
-          // final userDetails = await _userService.fetchUserDetails(loginResponse['accessToken']);
-          // if (userDetails['userType'] == 'Patient') {
-          //   Navigator.pushReplacementNamed(context, 'PatientHome', arguments: {'patientName': userDetails['userName'], 'patientId': userDetails['userId']});
-          // } else if (userDetails['userType'] == 'Doctor') {
-          //   Navigator.pushReplacementNamed(context, 'DoctortHome', arguments: {'doctorName': userDetails['userName']});
-          // } else {
-          //   // Handle unknown user type from user details API
-          // }
-
-          // For now, navigating to PatientHome with an empty map to prevent the Null type cast error.
-          // This is a temporary fix. You MUST replace this with actual user data.
-          Navigator.pushReplacementNamed(context, 'PatientHome', arguments: <String, dynamic>{});
+          Navigator.pushReplacementNamed(
+            context,
+            'PatientHome',
+            arguments: {
+              'patientName': patientName ?? 'Unknown Patient',
+              'patientId': int.parse(patientId),
+            },
+          );
         }
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Login failed: No access token received from API, despite successful HTTP status.',
-                style: TextStyle(color: primary),
-              ),
-              backgroundColor: secondary,
-              duration: const Duration(seconds: 3),
-            ),
-          );
-        }
+        throw Exception('No access token received from API');
       }
     } catch (e) {
       if (mounted) {
@@ -128,7 +121,7 @@ class _Signin extends State<Signin> {
         height: screenHeight,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [gradient1, gradient2], // Assuming gradient1 and gradient2 are defined
+            colors: [gradient1, gradient2],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -196,7 +189,7 @@ class _Signin extends State<Signin> {
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(25),
                                     borderSide: BorderSide(
-                                        color: textboxColor, width: 1.5), // Assuming textboxColor is defined
+                                        color: textboxColor, width: 1.5),
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(25),

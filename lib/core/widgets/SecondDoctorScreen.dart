@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:intl/intl.dart';
@@ -39,7 +37,7 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
   Future<void> registerUser() async {
     if (_formKeySecondScreen.currentState!.validate()) {
       try {
-        final registerModel = RegisterModel(
+        final response = await _registerService.register(
           fullName: nameController.text.isNotEmpty
               ? nameController.text
               : widget.fullName,
@@ -55,29 +53,19 @@ class _SecondDoctorScreenState extends State<SecondDoctorScreen> {
           password: widget.password,
           confirmPassword: widget.confirmPassword,
         );
-        print('Request Body: ${jsonEncode(registerModel.toJson())}');
-        RegisterModel response = await _registerService.register(
-          fullName: nameController.text.isNotEmpty
-              ? nameController.text
-              : widget.fullName,
-          email: widget.email,
-          gender: selectedGender ?? 'M',
-          dateOfBirth: birthDateController.text,
-          nationalId: nationalIdController.text,
-          phoneNumber: phoneNumberController.text,
-          userType: 'Doctor',
-          specialty: specialtyController.text.isEmpty
-              ? null
-              : specialtyController.text,
-          password: widget.password,
-          confirmPassword: widget.confirmPassword,
-        );
-        widget.onDone();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful! Please login.')),
+          );
+          widget.onDone();
+        }
       } catch (e) {
         debugPrint('Failed to register: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to register: $e')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to register: $e')),
+          );
+        }
       }
     }
   }
