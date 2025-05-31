@@ -28,6 +28,9 @@ class AddPatientService {
         body: patientModel.toJson(),
         token: token,
       );
+      if (response == null) {
+        throw Exception("No response from add patient API");
+      }
       return AddPatientModel.fromJson(response);
     } catch (e) {
       String errorMessage = "Failed to add patient: $e";
@@ -64,23 +67,25 @@ class AddPatientService {
     }
   }
 
-  Future<List<AddPatientModel>> getPatientsByName(String name,
-      {String? token}) async {
+  Future<List<AddPatientModel>> getPatientsByName(String name, {String? token}) async {
     try {
-      // If name is empty, fetch all patients
       final url = name.isEmpty
           ? "http://nabdapi.runasp.net/api/Patient"
           : "http://nabdapi.runasp.net/api/Patient/ByName/$name";
-      final response = await _api.get(
-        url: url,
-      );
 
-      if (response is List) {
-        return response.map((json) => AddPatientModel.fromJson(json)).toList();
+      final response = await _api.get(url: url);
+
+      if (response == null) {
+        return []; // no data returned
+      } else if (response is List) {
+        return response
+            .map((item) => AddPatientModel.fromJson(item as Map<String, dynamic>))
+            .toList();
       } else if (response is Map<String, dynamic>) {
+        // Sometimes API might return single object instead of list
         return [AddPatientModel.fromJson(response)];
       } else {
-        throw Exception('Unexpected response format: $response');
+        throw Exception("Unexpected response type: ${response.runtimeType}");
       }
     } catch (e) {
       print('Error in getPatientsByName: $e');

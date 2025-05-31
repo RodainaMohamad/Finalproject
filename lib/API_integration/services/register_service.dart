@@ -31,15 +31,12 @@ class RegisterService {
         confirmPassword: confirmPassword,
       );
       print('Request Body: ${jsonEncode(registerModel.toJson())}');
-
       final response = await Api().post(
-        url: "http://nabdapi.runasp.net/api/patient/register", // Update if endpoint changes
+        url: "http://nabdapi.runasp.net/register-user",
         body: registerModel.toJson(),
       );
 
-      print('DEBUG: Registration API Response: Status=${response['status']}, Body=$response');
-
-      if (response != null && response['status'] == 200) {
+      if (response != null) {
         final registerResponse = RegisterResponseModel.fromJson(response);
         if (registerResponse.id != null) {
           await AuthUtils.savePatientId(registerResponse.id!.toString());
@@ -47,17 +44,12 @@ class RegisterService {
           await AuthUtils.saveUserType(userType ?? 'Patient');
           print('DEBUG: Saved patient ID: ${registerResponse.id}, Name: $fullName, Type: ${userType ?? 'Patient'}');
         } else {
-          print('ERROR: No ID in registration response: $response');
-          throw Exception('Registration response missing ID');
+          print('WARNING: No ID in registration response');
         }
         return registerResponse;
       }
       throw Exception('No registration data returned');
     } catch (e) {
-      if (e.toString().contains('Status 405')) {
-        print('ERROR: Method Not Allowed (405). Endpoint may not support POST. Response: $e');
-        throw Exception('Registration failed: Server does not allow POST requests. Please check API configuration.');
-      }
       print('Registration Error: $e');
       throw Exception('Failed to register: $e');
     }

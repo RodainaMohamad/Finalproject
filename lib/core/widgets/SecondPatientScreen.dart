@@ -46,6 +46,7 @@ class _SecondPatientScreenState extends State<SecondPatientScreen> {
           nationalId: nationalIdController.text,
           phoneNumber: phoneNumberController.text,
           userType: 'Patient',
+          specialty:'',
           password: widget.password,
           confirmPassword: widget.confirmPassword,
         );

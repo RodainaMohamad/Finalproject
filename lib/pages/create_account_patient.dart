@@ -37,8 +37,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
     setState(() {
       showThankYou = true;
     });
-
-    // Display ThankYou screen for 3 seconds, then navigate to PatientHome
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
       final patientId = await AuthUtils.getPatientId();

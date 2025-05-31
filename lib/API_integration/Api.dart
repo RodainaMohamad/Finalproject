@@ -17,11 +17,9 @@ class Api {
         headers: headers,
         body: jsonEncode(body),
       );
-
       print('API Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body}');
-
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        return response.body.isNotEmpty ? jsonDecode(response.body) as Map<String, dynamic> : {};
       } else {
         throw Exception('Failed to post data: Status ${response.statusCode}, Body: ${response.body}');
       }
@@ -31,7 +29,7 @@ class Api {
     }
   }
 
-  Future<Map<String, dynamic>?> get({
+  Future<dynamic> get({
     required String url,
     String? token,
   }) async {
@@ -44,11 +42,13 @@ class Api {
         Uri.parse(url),
         headers: headers,
       );
-
-      print('API Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body}');
-
+      print('API Response: Status=${response.statusCode}, Body=${response.body}');
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        if (response.body.isNotEmpty) {
+          return jsonDecode(response.body);
+        } else {
+          return null; // or {} or []; depending on your API behavior
+        }
       } else {
         throw Exception('Failed to get data: Status ${response.statusCode}, Body: ${response.body}');
       }
@@ -58,32 +58,29 @@ class Api {
     }
   }
 
-  // Add if server requires PUT
-  Future<Map<String, dynamic>?> put({
+  Future<Map<String, dynamic>?> delete({
     required String url,
-    required Map<String, dynamic> body,
     String? token,
   }) async {
     try {
       final headers = {
-        'Content-Type': 'application/json',
+        'Accept': '*/*',
         if (token != null) 'Authorization': 'Bearer $token',
       };
-      final response = await http.put(
+      final response = await http.delete(
         Uri.parse(url),
         headers: headers,
-        body: jsonEncode(body),
       );
 
       print('API Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body}');
 
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        return jsonDecode(response.body) as Map<String, dynamic>;
+        return response.body.isNotEmpty ? jsonDecode(response.body) as Map<String, dynamic> : {};
       } else {
-        throw Exception('Failed to put data: Status ${response.statusCode}, Body: ${response.body}');
+        throw Exception('Failed to delete data: Status ${response.statusCode}, Body: ${response.body}');
       }
     } catch (e) {
-      print('Error in PUT request: $e');
+      print('Error in DELETE request: $e');
       throw Exception('Failed to connect: $e');
     }
   }
