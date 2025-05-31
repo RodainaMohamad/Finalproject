@@ -40,7 +40,6 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
     await Future.delayed(const Duration(seconds: 3));
 
     if (mounted) {
-      // ✅ Navigate directly to PatientHome without checking for ID or name
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
