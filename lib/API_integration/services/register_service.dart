@@ -24,7 +24,7 @@ class RegisterService {
         nationalId: nationalId,
         phoneNumber: phoneNumber,
         userType: userType ?? 'Patient',
-        specialty: specialty,
+        specialty: specialty ,
         password: password,
         confirmPassword: confirmPassword,
       );

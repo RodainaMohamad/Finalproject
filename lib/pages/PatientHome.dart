@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grad_project/API_integration/models/GetReportModel.dart';
+import 'package:grad_project/API_integration/services/GetReport_service.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
 import 'package:grad_project/core/widgets/HomeBottomBar.dart';
@@ -14,22 +16,28 @@ import 'package:grad_project/cubits/MQTT__Temp_states.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
 import 'package:grad_project/cubits/OxygenRate_states.dart';
 
-class PatientHome extends StatelessWidget {
+class PatientHome extends StatefulWidget {
   static const String routeName = 'PatientHome';
-  const PatientHome({super.key});
+  final String patientName;
+  final int patientId;
 
+  const PatientHome({super.key, required this.patientName, required this.patientId});
+
+  @override
+  _PatientHomeState createState() => _PatientHomeState();
+}
+
+class _PatientHomeState extends State<PatientHome> {
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
     final icons = [
-     // Icons.message_rounded,
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
     ];
     final routes = [
-      //'/messages',
-      '/menu', // Not used, replaced with showMenuDialog
+      '/menu',
       '/notifications',
     ];
     bool hasNotification = true;
@@ -100,7 +108,7 @@ class PatientHome extends StatelessWidget {
                             textAlign: TextAlign.right,
                           ),
                           Text(
-                            "Mohamed Ahmed ...",
+                            "${widget.patientName.isEmpty ? 'Unknown' : widget.patientName} ...",
                             style: GoogleFonts.nunito(
                               fontSize: 10,
                               height: 1.4,
@@ -114,8 +122,7 @@ class PatientHome extends StatelessWidget {
                       SizedBox(width: width * 0.02),
                       CircleAvatar(
                         radius: width * 0.07,
-                        backgroundImage:
-                        const AssetImage("assets/patientAvatar.png"),
+                        backgroundImage: const AssetImage("assets/patientAvatar.png"),
                       ),
                       SizedBox(width: width * 0.1),
                       Row(
@@ -147,7 +154,7 @@ class PatientHome extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                if (index == 2 && hasNotification)
+                                if (index == 1 && hasNotification)
                                   Positioned(
                                     bottom: width * 0.02,
                                     right: width * 0.02,
@@ -204,67 +211,93 @@ class PatientHome extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(height: height * 0.01),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            BlocBuilder<HeartRateCubit, HeartRateState>(
-                              builder: (context, state) {
-                                return StatusCard(
-                                  image: Image.asset("assets/heartRate.png"),
-                                  title: "Heart Rate",
-                                  value: _getHeartRateValue(state),
-                                  unit: "bpm",
-                                );
-                              },
-                            ),
-                            SizedBox(width: width * 0.01),
-                            BlocBuilder<TemperatureCubit, TemperatureState>(
-                              builder: (context, state) {
-                                return StatusCard(
-                                  image: Image.asset("assets/temp.png"),
-                                  title: "Temperature",
-                                  value: _getDisplayValue(state),
-                                  unit: "°C",
-                                );
-                              },
-                            ),
-                            SizedBox(width: width * 0.01),
-                            BlocBuilder<OxygenRateCubit, OxygenRateState>(
-                              builder: (context, state) {
-                                return StatusCard(
-                                  image: Image.asset("assets/pressure.png"),
-                                  unit: "%",
-                                  title: "Oxygen",
-                                  value: _getOxygenValue(state),
-                                );
-                              },
-                            ),
-                          ],
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  setState(() {});
+                },
+                child: SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Column(
+                    children: [
+                      SizedBox(height: height * 0.01),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              BlocBuilder<HeartRateCubit, HeartRateState>(
+                                builder: (context, state) {
+                                  return StatusCard(
+                                    image: Image.asset("assets/heartRate.png"),
+                                    title: "Heart Rate",
+                                    value: _getHeartRateValue(state),
+                                    unit: "bpm",
+                                  );
+                                },
+                              ),
+                              SizedBox(width: width * 0.01),
+                              BlocBuilder<TemperatureCubit, TemperatureState>(
+                                builder: (context, state) {
+                                  return StatusCard(
+                                    image: Image.asset("assets/temp.png"),
+                                    title: "Temperature",
+                                    value: _getDisplayValue(state),
+                                    unit: "°C",
+                                  );
+                                },
+                              ),
+                              SizedBox(width: width * 0.01),
+                              BlocBuilder<OxygenRateCubit, OxygenRateState>(
+                                builder: (context, state) {
+                                  return StatusCard(
+                                    image: Image.asset("assets/pressure.png"),
+                                    unit: "%",
+                                    title: "Oxygen",
+                                    value: _getOxygenValue(state),
+                                  );
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(height: height * 0.03),
-                    const CustomExpansionTile(
-                      title: "My Diagnoses",
-                      content:
-                      "Neu Heart hear stress Palpitat\n.\"\" It is recommended to jyjtyjt  but jgk tyjtdfx perform an ECG and thyroid function tests to confirm the diagnosis and rule out organic causes.",
-                    ),
-                    SizedBox(height: height * 0.03),
-                    const CustomExpansionTile(
-                      title: "My Medicine",
-                      content: "No this time.",
-                    ),
-                    SizedBox(height: height * 0.057),
-                    BottomNavWidget()
-                  ],
+                      SizedBox(height: height * 0.03),
+                      FutureBuilder(
+                        future: GetReportService().getReports(widget.patientId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const CustomExpansionTile(title: "My Diagnoses", content: "Loading...");
+                          } else if (snapshot.hasError) {
+                            return CustomExpansionTile(
+                              title: "My Diagnoses",
+                              content: snapshot.error.toString().contains('404')
+                                  ? "No reports found for this patient."
+                                  : "Error: ${snapshot.error}",
+                              trailing: IconButton(
+                                icon: const Icon(Icons.refresh),
+                                onPressed: () => setState(() {}),
+                              ),
+                            );
+                          } else if (!snapshot.hasData || (snapshot.data as List).isEmpty) {
+                            return const CustomExpansionTile(title: "My Diagnoses", content: "No diagnosis found.");
+                          } else {
+                            final reports = snapshot.data as List<GetReportModel>;
+                            final content = reports.map((e) => "• ${e.reportDetails}").join("\n\n");
+                            return CustomExpansionTile(title: "My Diagnoses", content: content);
+                          }
+                        },
+                      ),
+                      SizedBox(height: height * 0.03),
+                      const CustomExpansionTile(
+                        title: "My Medicine",
+                        content: "No this time.",
+                      ),
+                      SizedBox(height: height * 0.057),
+                      BottomNavWidget(),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -281,17 +314,18 @@ class PatientHome extends StatelessWidget {
     final temp = double.tryParse(state.temperature!) ?? 0;
     return temp.toStringAsFixed(1);
   }
+
   String _getHeartRateValue(HeartRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.heartRate == null || state.heartRate!.isEmpty) return "--";
     return state.heartRate!;
   }
+
   String _getOxygenValue(OxygenRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.oxygenRate == null) return "--";
-    // Display with 1 decimal place
     return state.oxygenRate!.toStringAsFixed(1);
   }
 }

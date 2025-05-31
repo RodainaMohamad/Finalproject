@@ -28,10 +28,8 @@ class _AddReportState extends State<AddReport> {
   @override
   void initState() {
     super.initState();
-    // Set default date to today
     _selectedDate = DateTime.now();
     _dateController.text = DateFormat('yyyy-MM-dd').format(_selectedDate!);
-    // Set patientId from widget
     _patientIDController.text = widget.patientId.toString();
   }
 
@@ -88,20 +86,17 @@ class _AddReportState extends State<AddReport> {
 
     setState(() => _isLoading = true);
     try {
-      const String token = "YOUR_AUTH_TOKEN_HERE"; // Replace with actual token
       final newReport = await _reportService.addReport(
         reportDetails: _reportDetailsController.text.trim(),
-        patientId: widget.patientId, // Use widget.patientId directly
+        patientId: widget.patientId,
         uploadDate: _selectedDate!.toUtc().toIso8601String(),
-        medicalStaffId: null, // Staff ID not used
-        token: token,
+        medicalStaffId: null,
       );
 
       if (widget.onReportAdded != null) {
         widget.onReportAdded!(newReport);
       }
 
-      // Show success dialog
       await showDialog(
         context: context,
         builder: (context) {
@@ -157,8 +152,7 @@ class _AddReportState extends State<AddReport> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xff2C999B),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -177,7 +171,7 @@ class _AddReportState extends State<AddReport> {
         },
       );
 
-      Navigator.pop(context); // Close bottom sheet
+      Navigator.pop(context);
     } catch (e) {
       setState(() => _isLoading = false);
       _showErrorDialog('Failed to add report: $e');
@@ -233,8 +227,7 @@ class _AddReportState extends State<AddReport> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xff2C999B),
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 40, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(30),
                   ),
@@ -262,7 +255,7 @@ class _AddReportState extends State<AddReport> {
         children: [
           Expanded(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.5, // Dynamic height
+              height: MediaQuery.of(context).size.height * 0.5,
               width: double.infinity,
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(16),
@@ -307,7 +300,7 @@ class _AddReportState extends State<AddReport> {
                     const SizedBox(height: 4),
                     TextField(
                       controller: _dateController,
-                      readOnly: true, // Prevent manual input
+                      readOnly: true,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),
@@ -341,7 +334,7 @@ class _AddReportState extends State<AddReport> {
                     const SizedBox(height: 8),
                     TextField(
                       controller: _patientIDController,
-                      readOnly: true, // Prevent editing
+                      readOnly: true,
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: const Color(0xFF2C6768),

@@ -4,11 +4,13 @@ import 'package:grad_project/core/constants/colours/colours.dart';
 class CustomExpansionTile extends StatelessWidget {
   final String title;
   final String content;
+  final Widget? trailing; // Add optional trailing parameter
 
   const CustomExpansionTile({
     Key? key,
     required this.title,
     required this.content,
+    this.trailing, // Make trailing optional
   }) : super(key: key);
 
   @override
@@ -17,7 +19,7 @@ class CustomExpansionTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFFA4E2E3),
+          color: const Color(0xFFA4E2E3),
           borderRadius: BorderRadius.circular(12),
         ),
         child: ExpansionTile(
@@ -31,6 +33,7 @@ class CustomExpansionTile extends StatelessWidget {
               color: secondary,
             ),
           ),
+          trailing: trailing, // Pass trailing to ExpansionTile
           children: [
             Padding(
               padding: const EdgeInsets.all(12.0),

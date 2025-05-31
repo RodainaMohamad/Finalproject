@@ -11,9 +11,9 @@ import 'package:grad_project/core/widgets/staffscrean.dart';
 
 class Doctorhome extends StatelessWidget {
   static const String routeName = 'DoctortHome';
-  final String doctorName; // Added parameter
+  final String doctorName;
 
-  const Doctorhome({super.key, required this.doctorName}); // Updated constructor
+  const Doctorhome({super.key, required this.doctorName});
 
   @override
   Widget build(BuildContext context) {

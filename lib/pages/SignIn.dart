@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grad_project/API_integration/services/login_service.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
-import 'package:grad_project/pages/PatientHome.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Signin extends StatefulWidget {
   static const String routeName = 'Signin';
@@ -25,14 +23,14 @@ class _Signin extends State<Signin> {
   Color noBorderColor = secondary;
 
   final LoginService _loginService = LoginService();
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   void _updateBorder(String button) {
     setState(() {
       if (button == 'Login') {
-        yesBorderColor = primary;
+        yesBorderColor = primary; // Assuming primary is defined in colours.dart
         noBorderColor = secondary;
-      } else {
+      }
+      else {
         noBorderColor = primary;
         yesBorderColor = secondary;
       }
@@ -40,46 +38,66 @@ class _Signin extends State<Signin> {
   }
 
   Future<void> _handleLogin() async {
-    if (!formKey.currentState!.validate()) return;
+    if (!formKey.currentState!.validate()) {
+      return;
+    }
     setState(() => isLoading = true);
 
     try {
-      final response = await _loginService.login(
+      final Map<String, dynamic> loginResponse = await _loginService.login(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
 
-      // Verify response types
-      final accessToken = response['accessToken'];
-      final refreshToken = response['refreshToken'];
-      print('accessToken type: ${accessToken.runtimeType}, value: $accessToken');
-      print('refreshToken type: ${refreshToken.runtimeType}, value: $refreshToken');
+      debugPrint('DEBUG: Login successful. Raw loginResponse: $loginResponse');
 
-      if (accessToken == null || refreshToken == null) {
-        throw Exception('Missing access or refresh token');
-      }
+      if (loginResponse['accessToken'] != null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Login successful! Access token received. Fetching user details...',
+                style: TextStyle(color: primary),
+              ),
+              backgroundColor: secondary,
+              duration: const Duration(seconds: 3),
+            ),
+          );
 
-      // Store tokens
-      try {
-        await _storage.write(key: 'auth_token', value: accessToken);
-        await _storage.write(key: 'refresh_token', value: refreshToken);
-        print('Stored accessToken: ${await _storage.read(key: 'auth_token')}');
-        print('Stored refreshToken: ${await _storage.read(key: 'refresh_token')}');
-      } catch (e) {
-        throw Exception('Failed to store tokens: $e');
-      }
+          // TODO: Implement a separate API call here to fetch user details (userType, userId, userName)
+          // For example:
+          // final userDetails = await _userService.fetchUserDetails(loginResponse['accessToken']);
+          // if (userDetails['userType'] == 'Patient') {
+          //   Navigator.pushReplacementNamed(context, 'PatientHome', arguments: {'patientName': userDetails['userName'], 'patientId': userDetails['userId']});
+          // } else if (userDetails['userType'] == 'Doctor') {
+          //   Navigator.pushReplacementNamed(context, 'DoctortHome', arguments: {'doctorName': userDetails['userName']});
+          // } else {
+          //   // Handle unknown user type from user details API
+          // }
 
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const PatientHome()),
-        );
+          // For now, navigating to PatientHome with an empty map to prevent the Null type cast error.
+          // This is a temporary fix. You MUST replace this with actual user data.
+          Navigator.pushReplacementNamed(context, 'PatientHome', arguments: <String, dynamic>{});
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Login failed: No access token received from API, despite successful HTTP status.',
+                style: TextStyle(color: primary),
+              ),
+              backgroundColor: secondary,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
         String errorMessage = e.toString().replaceFirst('Exception: ', '');
-        if (errorMessage.contains('MissingPluginException')) {
-          errorMessage = 'Storage error: Unable to save token. Please try again.';
+        if (errorMessage.contains('400')) {
+          errorMessage = 'Invalid email or password.';
         }
         debugPrint('Login error: $errorMessage');
         ScaffoldMessenger.of(context).showSnackBar(
@@ -107,10 +125,10 @@ class _Signin extends State<Signin> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: screenHeight,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [gradient1, gradient2],
+            colors: [gradient1, gradient2], // Assuming gradient1 and gradient2 are defined
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -159,94 +177,92 @@ class _Signin extends State<Signin> {
                         key: formKey,
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
-                          child: Center(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const SizedBox(height: 50),
-                                TextFormField(
-                                  controller: emailController,
-                                  keyboardType: TextInputType.emailAddress,
-                                  style: TextStyle(color: secondary),
-                                  decoration: InputDecoration(
-                                    labelText: 'Email',
-                                    labelStyle: TextStyle(color: secondary),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                      borderSide: BorderSide(
-                                          color: secondary, width: 2.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25),
-                                      borderSide: BorderSide(
-                                          color: textboxColor, width: 1.5),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(25),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 50),
+                              TextFormField(
+                                controller: emailController,
+                                keyboardType: TextInputType.emailAddress,
+                                style: TextStyle(color: secondary),
+                                decoration: InputDecoration(
+                                  labelText: 'Email',
+                                  labelStyle: TextStyle(color: secondary),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                    borderSide: BorderSide(
+                                        color: secondary, width: 2.0),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                    borderSide: BorderSide(
+                                        color: textboxColor, width: 1.5), // Assuming textboxColor is defined
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(25),
+                                  ),
+                                ),
+                                validator: (text) {
+                                  if (text!.isEmpty) {
+                                    return 'Field cannot be empty';
+                                  }
+                                  if (text.length < 6 ||
+                                      !text.contains('@') ||
+                                      !text.endsWith('.com') ||
+                                      text.startsWith('@')) {
+                                    return 'Invalid email';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 15.0),
+                              TextFormField(
+                                controller: passwordController,
+                                keyboardType: TextInputType.text,
+                                obscureText: !showPassword,
+                                style: TextStyle(color: secondary),
+                                decoration: InputDecoration(
+                                  labelText: 'Password',
+                                  labelStyle: TextStyle(color: secondary),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                    borderSide: BorderSide(
+                                        color: secondary, width: 2.0),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                    borderSide: BorderSide(
+                                        color: textboxColor, width: 1.5),
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(50),
+                                  ),
+                                  suffixIcon: IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        showPassword = !showPassword;
+                                      });
+                                    },
+                                    icon: Icon(
+                                      showPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: secondary,
                                     ),
                                   ),
-                                  validator: (text) {
-                                    if (text!.isEmpty) {
-                                      return 'Field cannot be empty';
-                                    }
-                                    if (text.length < 6 ||
-                                        !text.contains('@') ||
-                                        !text.endsWith('.com') ||
-                                        text.startsWith('@')) {
-                                      return 'Invalid email';
-                                    }
-                                    return null;
-                                  },
                                 ),
-                                const SizedBox(height: 15.0),
-                                TextFormField(
-                                  controller: passwordController,
-                                  keyboardType: TextInputType.text,
-                                  obscureText: !showPassword,
-                                  style: TextStyle(color: secondary),
-                                  decoration: InputDecoration(
-                                    labelText: 'Password',
-                                    labelStyle: TextStyle(color: secondary),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                      borderSide: BorderSide(
-                                          color: secondary, width: 2.0),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                      borderSide: BorderSide(
-                                          color: textboxColor, width: 1.5),
-                                    ),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(50),
-                                    ),
-                                    suffixIcon: IconButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          showPassword = !showPassword;
-                                        });
-                                      },
-                                      icon: Icon(
-                                        showPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off,
-                                        color: secondary,
-                                      ),
-                                    ),
-                                  ),
-                                  validator: (text) {
-                                    if (text!.isEmpty) {
-                                      return 'Field cannot be null';
-                                    }
-                                    if (text.length < 8) {
-                                      return 'Password must be at least 8 characters';
-                                    }
-                                    return null;
-                                  },
-                                ),
-                                const SizedBox(height: 30),
-                              ],
-                            ),
+                                validator: (text) {
+                                  if (text!.isEmpty) {
+                                    return 'Field cannot be null';
+                                  }
+                                  if (text.length < 8) {
+                                    return 'Password must be at least 8 characters';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 30),
+                            ],
                           ),
                         ),
                       ),
@@ -265,8 +281,7 @@ class _Signin extends State<Signin> {
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: secondary,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(10)),
+                                      borderRadius: BorderRadius.circular(10),
                                       side: BorderSide(
                                           width: 2, color: yesBorderColor),
                                     ),
@@ -274,7 +289,8 @@ class _Signin extends State<Signin> {
                                   child: isLoading
                                       ? CircularProgressIndicator(
                                     valueColor:
-                                    AlwaysStoppedAnimation<Color>(primary),
+                                    AlwaysStoppedAnimation<Color>(
+                                        primary),
                                   )
                                       : Text(
                                     'Login',
@@ -298,15 +314,15 @@ class _Signin extends State<Signin> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) =>
-                                          const DoctorPatient()),
+                                        builder: (context) =>
+                                        const DoctorPatient(),
+                                      ),
                                     );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: secondary,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: const BorderRadius.all(
-                                          Radius.circular(10)),
+                                      borderRadius: BorderRadius.circular(10),
                                       side: BorderSide(
                                           width: 2, color: yesBorderColor),
                                     ),

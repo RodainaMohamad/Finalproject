@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:grad_project/cubits/HeartRate_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_events.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
+import 'package:grad_project/cubits/auth_events.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
 import 'package:grad_project/pages/Doctorhome.dart';
 import 'package:grad_project/pages/PatientHome.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
         providers: [
+        BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => HeartRateCubit()),
         BlocProvider(create: (context) => TemperatureCubit()),
         BlocProvider(create: (context) => OxygenRateCubit()),
@@ -45,9 +47,20 @@ class MyApp extends StatelessWidget {
         'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
         'Signin': (context) => const Signin(),
         'DoctorPatient': (context) =>const DoctorPatient(),
-        'PatientHome': (context) => const PatientHome(),
+        'PatientHome': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return PatientHome(
+            patientName: args['patientName'] ?? 'Unknown Patient',
+            patientId: args['patientId'] ?? 0,
+          );
+        },
+        'DoctortHome': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return Doctorhome(
+            doctorName: args['doctorName'] as String,
+          );
+        },
         'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
-        'DoctortHome':(context)=>const Doctorhome(doctorName: 'Unknown',),
       },
     ));
   }

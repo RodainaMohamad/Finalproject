@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/models/registerModel.dart';
 import 'package:grad_project/API_integration/services/register_service.dart';
@@ -26,20 +27,17 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   final _formKeySecondScreen = GlobalKey<FormState>();
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController birthDateController = TextEditingController();
   final TextEditingController nationalIdController = TextEditingController();
   final TextEditingController phoneNumberController = TextEditingController();
-
   String? selectedGender;
-
   final RegisterService _registerService = RegisterService();
 
   Future<void> registerUser() async {
     if (_formKeySecondScreen.currentState!.validate()) {
       try {
-        RegisterModel response = await _registerService.register(
+        final registerModel = RegisterModel(
           fullName: nameController.text.isNotEmpty
               ? nameController.text
               : widget.fullName,
@@ -53,7 +51,21 @@ class _SecondScreenState extends State<SecondScreen> {
           confirmPassword: widget.confirmPassword,
           specialty: ""
         );
-
+        print('Request Body: ${jsonEncode(registerModel.toJson())}');
+        RegisterModel response = await _registerService.register(
+          fullName: nameController.text.isNotEmpty
+              ? nameController.text
+              : widget.fullName,
+          email: widget.email,
+          gender: selectedGender ?? 'M',
+          dateOfBirth: birthDateController.text,
+          nationalId: nationalIdController.text,
+          phoneNumber: phoneNumberController.text,
+          userType: 'patient',
+          specialty: "",
+          password: widget.password,
+          confirmPassword: widget.confirmPassword,
+        );
         widget.onDone();
       } catch (e) {
         debugPrint('Failed to register: $e');

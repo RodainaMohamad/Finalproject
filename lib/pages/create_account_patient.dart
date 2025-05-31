@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:grad_project/core/widgets/SecondPatientScreen.dart';
 import 'package:grad_project/core/widgets/first_screen.dart';
 import 'package:grad_project/core/widgets/thank_you.dart';
+import 'package:grad_project/pages/PatientHome.dart';
 
 class CreateAccountScreenPatient extends StatefulWidget {
   static const String routeName = 'CreateAccountScreenPatient';
@@ -33,7 +34,22 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
     setState(() {
       showThankYou = true;
     });
+
+    // Display ThankYou screen for 3 seconds, then navigate to PatientHome
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PatientHome(
+              patientName: fullName ?? 'Unknown', patientId:1040,
+            ),
+          ),
+        );
+      }
+    });
   }
+
 
   @override
   Widget build(BuildContext context) {
