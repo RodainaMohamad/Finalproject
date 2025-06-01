@@ -50,9 +50,8 @@ class _Signin extends State<Signin> {
       debugPrint('DEBUG: Login successful. Raw loginResponse: $loginResponse');
 
       if (loginResponse['accessToken'] != null) {
-        // Retrieve userType and fullName from AuthUtils
         final userName = await AuthUtils.getPatientName() ?? 'User';
-        final userType = await AuthUtils.getUserType() ?? 'Patient';
+        final userType = loginResponse['userType'] ?? 'Patient';
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -66,7 +65,6 @@ class _Signin extends State<Signin> {
             ),
           );
 
-          // Navigate based on userType
           if (userType == 'Doctor') {
             Navigator.pushReplacementNamed(
               context,

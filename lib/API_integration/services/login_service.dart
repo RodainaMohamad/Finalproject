@@ -10,6 +10,9 @@ class LoginService {
     required String password,
   }) async {
     try {
+      // Clear previous userType to avoid stale data
+      await AuthUtils.clearUserType();
+
       final loginResponse = await http.post(
         Uri.parse(loginUrl),
         headers: {'Content-Type': 'application/json'},
@@ -21,7 +24,8 @@ class LoginService {
         }),
       );
 
-      print("Login API Response: Status=${loginResponse.statusCode}, Body=${loginResponse.body}");
+      print("Login API Response: Status=${loginResponse
+          .statusCode}, Body=${loginResponse.body}");
 
       if (loginResponse.statusCode == 200) {
         if (loginResponse.body.isEmpty) {
@@ -31,7 +35,8 @@ class LoginService {
         final dynamic decodedData = jsonDecode(loginResponse.body);
 
         if (decodedData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(decodedData);
+          final Map<String, dynamic> data = Map<String, dynamic>.from(
+              decodedData);
 
           final String? accessToken = data['accessToken'] as String?;
           final String? refreshToken = data['refreshToken'] as String?;
@@ -48,13 +53,23 @@ class LoginService {
           }
           await AuthUtils.savePatientName(email.split('@')[0]);
 
+          // Infer userType based on email
+          String userType = email.toLowerCase().contains('doc')
+              ? 'Doctor'
+              : 'Patient';
+          await AuthUtils.saveUserType(userType);
+          print('DEBUG: Inferred and saved userType: $userType');
+
           return {
             'accessToken': accessToken,
             'refreshToken': refreshToken,
             'tokenType': tokenType,
+            'userType': userType,
           };
         } else {
-          throw Exception('Login API returned unexpected data format: ${decodedData.runtimeType}. Expected Map.');
+          throw Exception(
+              'Login API returned unexpected data format: ${decodedData
+                  .runtimeType}. Expected Map.');
         }
       } else {
         String errorMessage = 'Failed to login: ${loginResponse.statusCode}';
@@ -66,7 +81,8 @@ class LoginService {
             errorMessage += ' - $errorBody';
           }
         } catch (e) {
-          print('Warning: Could not parse error response body: ${loginResponse.body}');
+          print('Warning: Could not parse error response body: ${loginResponse
+              .body}');
         }
         throw Exception(errorMessage);
       }
