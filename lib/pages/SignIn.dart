@@ -50,23 +50,15 @@ class _Signin extends State<Signin> {
       debugPrint('DEBUG: Login successful. Raw loginResponse: $loginResponse');
 
       if (loginResponse['accessToken'] != null) {
-        await AuthUtils.saveToken(loginResponse['accessToken']);
-        if (loginResponse['refreshToken'] != null) {
-          await AuthUtils.saveRefreshToken(loginResponse['refreshToken']);
-        }
-
-        final patientId = await AuthUtils.getPatientId();
-        final patientName = await AuthUtils.getPatientName();
-
-        if (patientId == null) {
-          throw Exception('No patient ID found. Please register again.');
-        }
+        // Retrieve userType and fullName from AuthUtils
+        final userName = await AuthUtils.getPatientName() ?? 'User';
+        final userType = await AuthUtils.getUserType() ?? 'Patient';
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                'Login successful! Welcome ${patientName ?? 'User'}',
+                'Login successful! Welcome $userName',
                 style: TextStyle(color: primary),
               ),
               backgroundColor: secondary,
@@ -74,14 +66,20 @@ class _Signin extends State<Signin> {
             ),
           );
 
-          Navigator.pushReplacementNamed(
-            context,
-            'PatientHome',
-            arguments: {
-              'patientName': patientName ?? 'Unknown Patient',
-              'patientId': int.parse(patientId),
-            },
-          );
+          // Navigate based on userType
+          if (userType == 'Doctor') {
+            Navigator.pushReplacementNamed(
+              context,
+              'DoctortHome',
+              arguments: {'doctorName': userName},
+            );
+          } else {
+            Navigator.pushReplacementNamed(
+              context,
+              'PatientHome',
+              arguments: {'patientName': userName},
+            );
+          }
         }
       } else {
         throw Exception('No access token received from API');

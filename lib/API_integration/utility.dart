@@ -4,7 +4,6 @@ class AuthUtils {
   static const _storage = FlutterSecureStorage();
   static const String _tokenKey = 'auth_token';
   static const String _refreshTokenKey = 'refresh_token';
-  static const String _patientIdKey = 'patient_id';
   static const String _patientNameKey = 'patient_name';
   static const String _userTypeKey = 'user_type';
 
@@ -16,11 +15,6 @@ class AuthUtils {
   static Future<void> saveRefreshToken(String refreshToken) async {
     await _storage.write(key: _refreshTokenKey, value: refreshToken);
     print('DEBUG: Refresh token saved securely');
-  }
-
-  static Future<void> savePatientId(String id) async {
-    await _storage.write(key: _patientIdKey, value: id);
-    print('DEBUG: Patient ID saved securely: $id');
   }
 
   static Future<void> savePatientName(String name) async {
@@ -45,12 +39,6 @@ class AuthUtils {
     return token;
   }
 
-  static Future<String?> getPatientId() async {
-    final id = await _storage.read(key: _patientIdKey);
-    print('DEBUG: Patient ID retrieved: $id');
-    return id;
-  }
-
   static Future<String?> getPatientName() async {
     final name = await _storage.read(key: _patientNameKey);
     print('DEBUG: Patient name retrieved: $name');
@@ -66,9 +54,8 @@ class AuthUtils {
   static Future<void> clearToken() async {
     await _storage.delete(key: _tokenKey);
     await _storage.delete(key: _refreshTokenKey);
-    await _storage.delete(key: _patientIdKey);
     await _storage.delete(key: _patientNameKey);
     await _storage.delete(key: _userTypeKey);
-    print('DEBUG: Tokens, patient ID, name, and user type cleared securely');
+    print('DEBUG: Tokens, name, and user type cleared securely');
   }
 }

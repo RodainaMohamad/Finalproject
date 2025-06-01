@@ -16,6 +16,7 @@ import 'package:grad_project/pages/create_account_patient.dart';
 void main() {
   runApp(const MyApp());
 }
+
 void testStorage() async {
   final storage = FlutterSecureStorage();
   try {
@@ -33,35 +34,35 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-        providers: [
+      providers: [
         BlocProvider(create: (context) => AuthCubit()),
         BlocProvider(create: (context) => HeartRateCubit()),
         BlocProvider(create: (context) => TemperatureCubit()),
         BlocProvider(create: (context) => OxygenRateCubit()),
-    ],
-    child: MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: "Signin",
-      routes: {
-        'Splashscreen': (context) => const Splashscreen(),
-        'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
-        'Signin': (context) => const Signin(),
-        'DoctorPatient': (context) =>const DoctorPatient(),
-        'PatientHome': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return PatientHome(
-            patientName: args['patientName'] ?? 'Unknown Patient',
-            patientId: args['patientId'] ?? 0,
-          );
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        initialRoute: "Signin",
+        routes: {
+          'Splashscreen': (context) => const Splashscreen(),
+          'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
+          'Signin': (context) => const Signin(),
+          'DoctorPatient': (context) => const DoctorPatient(),
+          'PatientHome': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+            return PatientHome(
+              patientName: args?['patientName'] ?? 'Unknown Patient',
+            );
+          },
+          'DoctortHome': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+            return Doctorhome(
+              doctorName: args['doctorName'] as String,
+            );
+          },
+          'CreateAccountScreenDoctor': (context) => CreateAccountScreenDoctor(),
         },
-        'DoctortHome': (context) {
-          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-          return Doctorhome(
-            doctorName: args['doctorName'] as String,
-          );
-        },
-        'CreateAccountScreenDoctor':(context)=> CreateAccountScreenDoctor(),
-      },
-    ));
+      ),
+    );
   }
 }

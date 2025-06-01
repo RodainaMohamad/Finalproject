@@ -19,10 +19,9 @@ import 'package:grad_project/cubits/OxygenRate_states.dart';
 
 class PatientHome extends StatefulWidget {
   static const String routeName = 'PatientHome';
-  final String? patientName;
-  final int? patientId;
+  final String patientName; // Make patientName required
 
-  const PatientHome({Key? key, this.patientName, this.patientId}) : super(key: key);
+  const PatientHome({Key? key, required this.patientName}) : super(key: key);
 
   @override
   _PatientHomeState createState() => _PatientHomeState();
@@ -30,8 +29,6 @@ class PatientHome extends StatefulWidget {
 
 class _PatientHomeState extends State<PatientHome> {
   late Future<void> _loadUserInfoFuture;
-  late String _patientName;
-  late int _patientId;
 
   @override
   void initState() {
@@ -40,9 +37,14 @@ class _PatientHomeState extends State<PatientHome> {
   }
 
   Future<void> _loadUserInfo() async {
-    _patientName = widget.patientName ?? (await AuthUtils.getPatientName()) ?? 'Unknown';
-    final idString = widget.patientId?.toString() ?? await AuthUtils.getPatientId() ?? '0';
-    _patientId = int.tryParse(idString) ?? 0;
+    final token = await AuthUtils.getToken();
+    if (token == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        AuthUtils.clearToken();
+        Navigator.pushReplacementNamed(context, 'Signin');
+      });
+      return;
+    }
   }
 
   @override
@@ -67,7 +69,6 @@ class _PatientHomeState extends State<PatientHome> {
             body: Center(child: CircularProgressIndicator()),
           );
         }
-        // Build the UI once patient info is loaded
         return Scaffold(
           body: Container(
             height: height,
@@ -134,7 +135,7 @@ class _PatientHomeState extends State<PatientHome> {
                                 textAlign: TextAlign.right,
                               ),
                               Text(
-                                "$_patientName...",
+                                "${widget.patientName}...", // Use patientName from widget
                                 style: GoogleFonts.nunito(
                                   fontSize: 10,
                                   height: 1.4,
@@ -291,7 +292,7 @@ class _PatientHomeState extends State<PatientHome> {
                           ),
                           SizedBox(height: height * 0.03),
                           FutureBuilder<PatientDetailsModel>(
-                            future: PatientDetailsService().getPatientDetails(_patientId),
+                            future: PatientDetailsService().getPatientDetails(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const CustomExpansionTile(title: "My Diagnoses", content: "Loading...");

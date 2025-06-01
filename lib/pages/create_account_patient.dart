@@ -44,8 +44,7 @@ class _CreateAccountScreenState extends State<CreateAccountScreenPatient> {
         context,
         MaterialPageRoute(
           builder: (context) => const PatientHome(
-            patientName: 'Patient', // or any default/static value
-            patientId: 0, // You can set 0 or -1 as a placeholder
+            patientName: 'Patient',
           ),
         ),
       );

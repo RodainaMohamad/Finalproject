@@ -38,14 +38,9 @@ class RegisterService {
 
       if (response != null) {
         final registerResponse = RegisterResponseModel.fromJson(response);
-        if (registerResponse.id != null) {
-          await AuthUtils.savePatientId(registerResponse.id!.toString());
-          await AuthUtils.savePatientName(fullName);
-          await AuthUtils.saveUserType(userType ?? 'Patient');
-          print('DEBUG: Saved patient ID: ${registerResponse.id}, Name: $fullName, Type: ${userType ?? 'Patient'}');
-        } else {
-          print('WARNING: No ID in registration response');
-        }
+        await AuthUtils.savePatientName(fullName);
+        await AuthUtils.saveUserType(userType ?? 'Patient');
+        print('DEBUG: Saved Name: $fullName, Type: ${userType ?? 'Patient'}');
         return registerResponse;
       }
       throw Exception('No registration data returned');

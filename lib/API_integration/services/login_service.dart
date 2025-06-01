@@ -1,38 +1,37 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:grad_project/API_integration/utility.dart';
 
 class LoginService {
-  final String apiUrl = "http://nabdapi.runasp.net/login";
+  final String loginUrl = "http://nabdapi.runasp.net/login";
 
   Future<Map<String, dynamic>> login({
     required String email,
     required String password,
   }) async {
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
+      final loginResponse = await http.post(
+        Uri.parse(loginUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': email,
           'password': password,
           'twoFactorCode': '',
-          'twoFactorRecoveryCode': ''
+          'twoFactorRecoveryCode': '',
         }),
       );
 
-      print(
-          "API Response: Status=${response.statusCode}, Body=${response.body}");
+      print("Login API Response: Status=${loginResponse.statusCode}, Body=${loginResponse.body}");
 
-      if (response.statusCode == 200) {
-        if (response.body.isEmpty) {
+      if (loginResponse.statusCode == 200) {
+        if (loginResponse.body.isEmpty) {
           throw Exception('Login API returned an empty response body.');
         }
 
-        final dynamic decodedData = jsonDecode(response.body);
+        final dynamic decodedData = jsonDecode(loginResponse.body);
 
         if (decodedData is Map) {
-          final Map<String, dynamic> data = Map<String, dynamic>.from(
-              decodedData);
+          final Map<String, dynamic> data = Map<String, dynamic>.from(decodedData);
 
           final String? accessToken = data['accessToken'] as String?;
           final String? refreshToken = data['refreshToken'] as String?;
@@ -42,28 +41,32 @@ class LoginService {
             throw Exception('Login API response missing or empty accessToken.');
           }
 
+          // Save tokens
+          await AuthUtils.saveToken(accessToken);
+          if (refreshToken != null) {
+            await AuthUtils.saveRefreshToken(refreshToken);
+          }
+          await AuthUtils.savePatientName(email.split('@')[0]);
+
           return {
             'accessToken': accessToken,
             'refreshToken': refreshToken,
             'tokenType': tokenType,
           };
         } else {
-          throw Exception(
-              'Login API returned unexpected data format: ${decodedData
-                  .runtimeType}. Expected Map.');
+          throw Exception('Login API returned unexpected data format: ${decodedData.runtimeType}. Expected Map.');
         }
       } else {
-        String errorMessage = 'Failed to login: ${response.statusCode}';
+        String errorMessage = 'Failed to login: ${loginResponse.statusCode}';
         try {
-          final errorBody = jsonDecode(response.body);
+          final errorBody = jsonDecode(loginResponse.body);
           if (errorBody is Map && errorBody.containsKey('message')) {
             errorMessage += ' - ${errorBody['message']}';
           } else if (errorBody is String && errorBody.isNotEmpty) {
             errorMessage += ' - $errorBody';
           }
         } catch (e) {
-          print(
-              'Warning: Could not parse error response body: ${response.body}');
+          print('Warning: Could not parse error response body: ${loginResponse.body}');
         }
         throw Exception(errorMessage);
       }

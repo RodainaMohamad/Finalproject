@@ -1,30 +1,44 @@
-// In services/patient_details_service.dart
-import 'package:grad_project/API_integration/api.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:grad_project/API_integration/models/PatientDetailsModel.dart';
 import 'package:grad_project/API_integration/utility.dart';
 
-
 class PatientDetailsService {
-  final Api _api = Api();
+  final String baseUrl = "http://nabdapi.runasp.net/api/patient/details";
 
-  Future<PatientDetailsModel> getPatientDetails(int patientId) async {
+  Future<PatientDetailsModel> getPatientDetails() async {
     try {
       final token = await AuthUtils.getToken();
-      final response = await _api.get(
-        url: "http://nabdapi.runasp.net/api/Patient/$patientId/Reports",
+      if (token == null) {
+        throw Exception('No access token found. Please log in.');
+      }
 
+      final response = await http.get(
+        Uri.parse(baseUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
       );
 
-      print('Patient Reports Response: $response');
+      print('Patient Details API Response: Status=${response.statusCode}, Body=${response.body}');
 
-      if (response != null) {
-        return PatientDetailsModel.fromJson(response);
+      if (response.statusCode == 200) {
+        if (response.body.isEmpty) {
+          throw Exception('Empty response body.');
+        }
+        final data = jsonDecode(response.body);
+        return PatientDetailsModel.fromJson(data);
+      } else if (response.statusCode == 401) {
+        throw Exception('Unauthorized: Invalid or expired token.');
+      } else if (response.statusCode == 404) {
+        throw Exception('No patient details found.');
       } else {
-        throw Exception('No reports returned');
+        throw Exception('Failed to fetch patient details: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      print('Error fetching patient reports: $e');
-      throw Exception('Failed to fetch patient reports: $e');
+      print('PatientDetailsService Error: $e');
+      throw Exception('Error fetching patient details: $e');
     }
   }
 }
