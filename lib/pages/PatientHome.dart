@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:grad_project/API_integration/models/PatientDetailsModel.dart';
-import 'package:grad_project/API_integration/services/PatientDetails_service.dart';
+import 'package:grad_project/API_integration/models/GetReportModel.dart';
+import 'package:grad_project/API_integration/models/PatientByIdModel.dart';
+import 'package:grad_project/API_integration/services/GetReport_service.dart';
+import 'package:grad_project/API_integration/services/PatientByIdService.dart';
+import 'package:grad_project/API_integration/services/PatientByName_service.dart';
 import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
@@ -19,7 +22,7 @@ import 'package:grad_project/cubits/OxygenRate_states.dart';
 
 class PatientHome extends StatefulWidget {
   static const String routeName = 'PatientHome';
-  final String patientName; // Make patientName required
+  final String patientName;
 
   const PatientHome({Key? key, required this.patientName}) : super(key: key);
 
@@ -29,6 +32,8 @@ class PatientHome extends StatefulWidget {
 
 class _PatientHomeState extends State<PatientHome> {
   late Future<void> _loadUserInfoFuture;
+  int? _patientId;
+  PatientByIdModel? _patientDetails;
 
   @override
   void initState() {
@@ -45,6 +50,28 @@ class _PatientHomeState extends State<PatientHome> {
       });
       return;
     }
+
+    _patientId = await AuthUtils.getPatientId();
+    if (_patientId == null) {
+      try {
+        final name = await AuthUtils.getPatientName();
+        if (name == null) {
+          throw Exception('No patient name found in storage');
+        }
+        _patientId = await PatientByNameService().getPatientIdByName(name);
+      } catch (e) {
+        print('DEBUG: Failed to fetch patient ID: $e');
+        _patientId = 1051; // Fallback for testing
+        await AuthUtils.savePatientId(_patientId!);
+      }
+    }
+
+    try {
+      _patientDetails = await PatientByIdService().getPatientById(_patientId!);
+      print('DEBUG: Patient details loaded: ${_patientDetails?.id}');
+    } catch (e) {
+      print('DEBUG: Failed to load patient details: $e');
+    }
   }
 
   @override
@@ -54,10 +81,6 @@ class _PatientHomeState extends State<PatientHome> {
     final icons = [
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
-    ];
-    final routes = [
-      '/menu',
-      '/notifications',
     ];
     bool hasNotification = true;
 
@@ -75,10 +98,7 @@ class _PatientHomeState extends State<PatientHome> {
             width: width,
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  gradient1,
-                  gradient2,
-                ],
+                colors: [gradient1, gradient2],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -135,7 +155,7 @@ class _PatientHomeState extends State<PatientHome> {
                                 textAlign: TextAlign.right,
                               ),
                               Text(
-                                "${widget.patientName}...", // Use patientName from widget
+                                "${_patientDetails?.name ?? widget.patientName}...",
                                 style: GoogleFonts.nunito(
                                   fontSize: 10,
                                   height: 1.4,
@@ -149,7 +169,8 @@ class _PatientHomeState extends State<PatientHome> {
                           SizedBox(width: width * 0.02),
                           CircleAvatar(
                             radius: width * 0.07,
-                            backgroundImage: const AssetImage("assets/patientAvatar.png"),
+                            backgroundImage:
+                            const AssetImage("assets/patientAvatar.png"),
                           ),
                           SizedBox(width: width * 0.1),
                           Row(
@@ -160,7 +181,7 @@ class _PatientHomeState extends State<PatientHome> {
                                   if (index == 0) {
                                     showMenuDialog(context);
                                   } else {
-                                    Navigator.pushNamed(context, routes[index]);
+                                    print('Notifications not implemented yet');
                                   }
                                 },
                                 child: Stack(
@@ -291,17 +312,22 @@ class _PatientHomeState extends State<PatientHome> {
                             ),
                           ),
                           SizedBox(height: height * 0.03),
-                          FutureBuilder<PatientDetailsModel>(
-                            future: PatientDetailsService().getPatientDetails(),
+                          FutureBuilder<List<GetReportModel>>(
+                            future: _patientId != null
+                                ? GetReportService().getReports(_patientId!)
+                                : Future.error('Patient ID not loaded'),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
-                                return const CustomExpansionTile(title: "My Diagnoses", content: "Loading...");
+                                return const CustomExpansionTile(
+                                  title: "My Diagnoses",
+                                  content: Text("Loading..."),
+                                );
                               } else if (snapshot.hasError) {
                                 final error = snapshot.error.toString();
                                 if (error.contains('401')) {
                                   return CustomExpansionTile(
                                     title: "My Diagnoses",
-                                    content: "Session expired. Please log in again.",
+                                    content: Text("Session expired. Please log in again."),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.login),
                                       onPressed: () {
@@ -313,21 +339,36 @@ class _PatientHomeState extends State<PatientHome> {
                                 }
                                 return CustomExpansionTile(
                                   title: "My Diagnoses",
-                                  content: error.contains('404') ? "No reports found." : "Error: $error",
+                                  content: Text(error.contains('404') ? "No reports found." : "Error: $error"),
                                   trailing: IconButton(
                                     icon: const Icon(Icons.refresh),
                                     onPressed: () => setState(() {}),
                                   ),
                                 );
-                              } else if (!snapshot.hasData || snapshot.data!.reports == null || snapshot.data!.reports!.isEmpty) {
-                                return const CustomExpansionTile(title: "My Diagnoses", content: "No reports found.");
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const CustomExpansionTile(
+                                  title: "My Diagnoses",
+                                  content: Text("No reports found."),
+                                );
                               } else {
-                                final reports = snapshot.data!.reports!;
+                                final reports = snapshot.data!;
                                 return CustomExpansionTile(
                                   title: "My Diagnoses",
-                                  content: reports
-                                      .map((report) => "• ${report.reportDetails}\n  Date: ${report.uploadDate?.split('T').first ?? 'Unknown'}")
-                                      .join("\n"),
+                                  content: SizedBox(
+                                    height: 200,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: reports.length,
+                                      itemBuilder: (context, index) {
+                                        final report = reports[index];
+                                        return ListTile(
+                                          title: Text(report.reportDetails ?? 'No details'),
+                                          subtitle: Text('Date: ${report.uploadDate.split('T').first}'),
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 );
                               }
                             },
@@ -335,7 +376,7 @@ class _PatientHomeState extends State<PatientHome> {
                           SizedBox(height: height * 0.03),
                           const CustomExpansionTile(
                             title: "My Medicine",
-                            content: "No this time.",
+                            content: Text("No this time."),
                           ),
                           SizedBox(height: height * 0.057),
                           BottomNavWidget(),

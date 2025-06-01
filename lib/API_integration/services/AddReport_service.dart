@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:grad_project/API_integration/services/PatientByName_service.dart';
 import 'package:grad_project/API_integration/utility.dart';
 import 'package:http/http.dart' as http;
 import 'package:grad_project/API_integration/models/AddReportModel.dart';
@@ -8,14 +9,26 @@ class AddReportService {
 
   Future<AddReportModel> addReport({
     required String reportDetails,
-    required int patientId,
     required String uploadDate,
     int? medicalStaffId,
   }) async {
+    int? patientId;
     try {
       final String? token = await AuthUtils.getToken();
+      patientId = await AuthUtils.getPatientId();
       if (token == null) {
         throw Exception('No authentication token found. Please log in.');
+      }
+      if (patientId == null) {
+        try {
+          final name = await AuthUtils.getPatientName();
+          if (name == null) {
+            throw Exception('No patient name found in storage');
+          }
+          patientId = await PatientByNameService().getPatientIdByName(name);
+        } catch (e) {
+          throw Exception('No patient ID found: $e');
+        }
       }
 
       final reportModel = AddReportModel(
@@ -43,7 +56,7 @@ class AddReportService {
         throw Exception('Failed to add report: ${response.statusCode} ${response.reasonPhrase}');
       }
     } catch (e) {
-      print('Error adding report for patientId $patientId: $e');
+      print('Error adding report for patientId ${patientId ?? 'unknown'}: $e');
       throw Exception('Error adding report: $e');
     }
   }

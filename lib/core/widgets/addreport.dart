@@ -4,7 +4,7 @@ import 'package:grad_project/API_integration/services/AddReport_service.dart';
 import 'package:intl/intl.dart';
 
 class AddReport extends StatefulWidget {
-  final int patientId;
+  final int patientId; // Keep for display
   final Function(AddReportModel)? onReportAdded;
 
   const AddReport({
@@ -90,7 +90,6 @@ class _AddReportState extends State<AddReport> {
     try {
       final newReport = await _reportService.addReport(
         reportDetails: _reportDetailsController.text.trim(),
-        patientId: widget.patientId,
         uploadDate: _selectedDate!.toUtc().toIso8601String(),
         medicalStaffId: null,
       );

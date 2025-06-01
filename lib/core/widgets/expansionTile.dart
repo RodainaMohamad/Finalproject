@@ -3,14 +3,14 @@ import 'package:grad_project/core/constants/colours/colours.dart';
 
 class CustomExpansionTile extends StatelessWidget {
   final String title;
-  final String content;
-  final Widget? trailing; // Add optional trailing parameter
+  final dynamic content; // Changed to dynamic to accept both String and Widget
+  final Widget? trailing;
 
   const CustomExpansionTile({
     Key? key,
     required this.title,
     required this.content,
-    this.trailing, // Make trailing optional
+    this.trailing,
   }) : super(key: key);
 
   @override
@@ -33,17 +33,19 @@ class CustomExpansionTile extends StatelessWidget {
               color: secondary,
             ),
           ),
-          trailing: trailing, // Pass trailing to ExpansionTile
+          trailing: trailing,
           children: [
             Padding(
               padding: const EdgeInsets.all(12.0),
-              child: Text(
+              child: content is String
+                  ? Text(
                 content,
                 style: TextStyle(
                   fontSize: 14,
                   color: secondary,
                 ),
-              ),
+              )
+                  : content, // If it's a Widget, use it directly
             ),
           ],
         ),

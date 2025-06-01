@@ -6,6 +6,7 @@ class AuthUtils {
   static const _keyRefreshToken = 'refreshToken';
   static const _keyPatientName = 'patientName';
   static const _keyUserType = 'userType';
+  static const _keyPatientId = 'patientId';
 
   static Future<void> saveToken(String token) async {
     await _storage.write(key: _keyToken, value: token);
@@ -27,7 +28,7 @@ class AuthUtils {
 
   static Future<void> savePatientName(String name) async {
     await _storage.write(key: _keyPatientName, value: name);
-    print('DEBUG: Patient name saved securely: $name');
+    print('DEBUG: Patient name saved: $name');
   }
 
   static Future<String?> getPatientName() async {
@@ -38,7 +39,7 @@ class AuthUtils {
 
   static Future<void> saveUserType(String userType) async {
     await _storage.write(key: _keyUserType, value: userType);
-    print('DEBUG: User type saved securely: $userType');
+    print('DEBUG: User type saved: $userType');
   }
 
   static Future<String?> getUserType() async {
@@ -49,13 +50,22 @@ class AuthUtils {
 
   static Future<void> clearUserType() async {
     await _storage.delete(key: _keyUserType);
-    print('DEBUG: User type cleared from storage');
+    print('DEBUG: User type cleared');
+  }
+
+  static Future<void> savePatientId(int id) async {
+    await _storage.write(key: _keyPatientId, value: id.toString());
+    print('DEBUG: Patient ID saved: $id');
+  }
+
+  static Future<int?> getPatientId() async {
+    final id = await _storage.read(key: _keyPatientId);
+    print('DEBUG: Patient ID retrieved: $id');
+    return id != null ? int.tryParse(id) : null;
   }
 
   static Future<void> clearToken() async {
-    await _storage.delete(key: _keyToken);
-    await _storage.delete(key: _keyRefreshToken);
-    await _storage.delete(key: _keyPatientName);
-    await _storage.delete(key: _keyUserType);
+    await _storage.deleteAll();
+    print('DEBUG: Storage cleared');
   }
 }
