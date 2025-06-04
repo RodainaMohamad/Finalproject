@@ -13,7 +13,7 @@ class PatientIdDetailsService {
       final response = await http.get(url, headers: headers);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        print('Patient $id API response: $jsonResponse'); // Debug API response
+        print('Patient $id API response: ${jsonResponse['reports']?['\$values'] ?? 'No reports'}');
         return PatientByIdModel.fromJson(jsonResponse);
       } else {
         throw Exception('Failed to load patient details: ${response.statusCode} ${response.reasonPhrase}');

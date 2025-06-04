@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/services/DeletePatient_service.dart';
 import 'package:grad_project/core/widgets/EditReport.dart';
-import 'package:grad_project/core/widgets/addreport.dart';
 import '../../API_integration/models/patientmodel.dart';
+import 'addreport.dart';
 import '../../API_integration/models/PatientByIdModel.dart';
 
 class PatientCardWidget extends StatefulWidget {
@@ -37,15 +37,9 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
   @override
   void initState() {
     super.initState();
-    if (widget.reportId != null &&
-        widget.initialReportDetails != null &&
-        widget.initialReportDate != null) {
-      _selectedReport = Report(
-        id: int.tryParse(widget.reportId!),
-        reportDetails: widget.initialReportDetails,
-        uploadDate: widget.initialReportDate!.toIso8601String(),
-      );
-    } else if (widget.reports != null && widget.reports!.isNotEmpty) {
+    print('PatientCardWidget init for patient ${widget.patient.id}: ${widget.reports?.length ?? 0} reports');
+    if (widget.reports != null && widget.reports!.isNotEmpty) {
+      // Select the latest report by uploadDate
       _selectedReport = widget.reports!.reduce((a, b) {
         final aDate = DateTime.tryParse(a.uploadDate ?? '');
         final bDate = DateTime.tryParse(b.uploadDate ?? '');
@@ -180,7 +174,7 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                                                       widget.index + 1,
                                                   onReportAdded: (newReport) {
                                                     widget.onReportUpdated
-                                                        ?.call(); // Trigger update
+                                                        ?.call();
                                                     ScaffoldMessenger.of(
                                                         context)
                                                         .showSnackBar(
@@ -283,104 +277,107 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                         }
                       }
                     } else if (value == 'edit') {
-                      if (widget.reports == null || widget.reports!.isEmpty) {
+                      if (widget.reports != null && widget.reports!.isNotEmpty) {
+                        await showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text('Select Report to Edit'),
+                              content: StatefulBuilder(
+                                builder: (context, setState) {
+                                  print('Dropdown reports for patient ${widget.patient.id}: ${widget.reports!.map((r) => 'ID: ${r.id}, Details: ${r.reportDetails}').toList()}');
+                                  return DropdownButton<Report>(
+                                    isExpanded: true,
+                                    value: _selectedReport,
+                                    hint: const Text('Select a report'),
+                                    items: widget.reports!.asMap().entries.map((entry) {
+                                      final index = entry.key;
+                                      final report = entry.value;
+                                      return DropdownMenuItem<Report>(
+                                        value: report,
+                                        child: Text(
+                                          'Report ${report.id ?? index}: ${report.reportDetails?.substring(0, report.reportDetails!.length > 20 ? 20 : null) ?? 'No details'}...',
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (Report? newValue) {
+                                      setState(() {
+                                        _selectedReport = newValue;
+                                        print('Selected report for patient ${widget.patient.id}: ID ${_selectedReport?.id}, Details: ${_selectedReport?.reportDetails}');
+                                      });
+                                    },
+                                  );
+                                },
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    if (_selectedReport != null) {
+                                      Navigator.pop(context);
+                                      showModalBottomSheet(
+                                        context: context,
+                                        backgroundColor: Colors.transparent,
+                                        builder: (context) {
+                                          return Center(
+                                            child: Container(
+                                              width: screenWidth * 0.9,
+                                              padding: const EdgeInsets.all(16),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xff2C999B),
+                                                borderRadius:
+                                                BorderRadius.circular(25),
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 1,
+                                                ),
+                                              ),
+                                              child: EditReport(
+                                                patientId: widget.patient.id ??
+                                                    widget.index + 1,
+                                                reportId:
+                                                _selectedReport!.id!.toString(),
+                                                initialReportDetails:
+                                                _selectedReport!.reportDetails ??
+                                                    '',
+                                                initialDate: DateTime.parse(
+                                                    _selectedReport!.uploadDate!),
+                                                onReportUpdated: (updatedReport) {
+                                                  widget.onReportUpdated?.call();
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    const SnackBar(
+                                                      content: Text(
+                                                          'Report updated successfully'),
+                                                      backgroundColor: Colors.green,
+                                                    ),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Edit'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content: Text('No report available to edit'),
+                            content: Text('No reports available to edit'),
                             backgroundColor: Colors.red,
                           ),
                         );
-                        return;
                       }
-
-                      await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            title: const Text('Select Report to Edit'),
-                            content: StatefulBuilder(
-                              builder: (context, setState) {
-                                return DropdownButton<Report>(
-                                  isExpanded: true,
-                                  value: _selectedReport,
-                                  hint: const Text('Select a report'),
-                                  items: widget.reports!.map((report) {
-                                    return DropdownMenuItem<Report>(
-                                      value: report,
-                                      child: Text(
-                                        'Report ${report.id}: ${report.reportDetails ?? 'No details'}',
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (Report? newValue) {
-                                    setState(() {
-                                      _selectedReport = newValue;
-                                    });
-                                  },
-                                );
-                              },
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(context),
-                                child: const Text('Cancel'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  if (_selectedReport != null) {
-                                    Navigator.pop(context);
-                                    showModalBottomSheet(
-                                      context: context,
-                                      backgroundColor: Colors.transparent,
-                                      builder: (context) {
-                                        return Center(
-                                          child: Container(
-                                            width: screenWidth * 0.9,
-                                            padding: const EdgeInsets.all(16),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xff2C999B),
-                                              borderRadius:
-                                              BorderRadius.circular(25),
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 1,
-                                              ),
-                                            ),
-                                            child: EditReport(
-                                              patientId: widget.patient.id ??
-                                                  widget.index + 1,
-                                              reportId:
-                                              _selectedReport!.id!.toString(),
-                                              initialReportDetails:
-                                              _selectedReport!.reportDetails ??
-                                                  '',
-                                              initialDate: DateTime.parse(
-                                                  _selectedReport!.uploadDate!),
-                                              onReportUpdated: (updatedReport) {
-                                                widget.onReportUpdated?.call();
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  const SnackBar(
-                                                    content: Text(
-                                                        'Report updated successfully'),
-                                                    backgroundColor: Colors.green,
-                                                  ),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  }
-                                },
-                                child: const Text('Edit'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
                     }
                   },
                   itemBuilder: (context) => [
