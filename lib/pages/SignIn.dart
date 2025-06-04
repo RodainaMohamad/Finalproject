@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grad_project/API_integration/services/PatientByName_service.dart';
 import 'package:grad_project/API_integration/services/login_service.dart';
 import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
@@ -22,6 +23,7 @@ class _Signin extends State<Signin> {
   Color noBorderColor = secondary;
 
   final LoginService _loginService = LoginService();
+  final PatientByNameService _patientByNameService = PatientByNameService();
 
   void _updateBorder(String button) {
     setState(() {
@@ -42,6 +44,11 @@ class _Signin extends State<Signin> {
     setState(() => isLoading = true);
 
     try {
+      // Clear previous patient ID
+      await AuthUtils.clearPatientId();
+      print('DEBUG: Cleared previous patient ID');
+
+      // Perform login
       final Map<String, dynamic> loginResponse = await _loginService.login(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
@@ -50,7 +57,30 @@ class _Signin extends State<Signin> {
       debugPrint('DEBUG: Login successful. Raw loginResponse: $loginResponse');
 
       if (loginResponse['accessToken'] != null) {
-        final userName = await AuthUtils.getPatientName() ?? 'User';
+        // Save token and refresh token
+        await AuthUtils.saveToken(loginResponse['accessToken']);
+        await AuthUtils.saveRefreshToken(loginResponse['refreshToken']);
+
+        // Save patient name (e.g., "asad" from "asad123@gmail.com")
+        final email = emailController.text.trim();
+        // Strip numbers to match API's letters-only name (e.g., "asad123" -> "asad")
+        final userName = email.split('@')[0].replaceAll(RegExp(r'\d+'), '');
+        await AuthUtils.savePatientName(userName);
+        print('DEBUG: Saved patient name: $userName');
+
+        // Attempt to fetch and save patient ID
+        try {
+          final patientId = await _patientByNameService.getPatientIdByName(userName);
+          if (patientId != null) {
+            await AuthUtils.savePatientId(patientId);
+            print('DEBUG: Saved patient ID: $patientId');
+          } else {
+            print('DEBUG: No patient ID found for $userName');
+          }
+        } catch (e) {
+          print('DEBUG: Failed to fetch patient ID for $userName: $e');
+        }
+
         final userType = loginResponse['userType'] ?? 'Patient';
 
         if (mounted) {
@@ -95,7 +125,7 @@ class _Signin extends State<Signin> {
               'Login failed: $errorMessage',
               style: TextStyle(color: primary),
             ),
-            backgroundColor: secondary,
+            backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
         );
@@ -227,22 +257,22 @@ class _Signin extends State<Signin> {
                                     borderRadius: BorderRadius.circular(50),
                                   ),
                                   suffixIcon: IconButton(
-                                    onPressed: () {
-                                      setState(() {
-                                        showPassword = !showPassword;
-                                      });
-                                    },
                                     icon: Icon(
                                       showPassword
                                           ? Icons.visibility
                                           : Icons.visibility_off,
                                       color: secondary,
                                     ),
+                                    onPressed: () {
+                                      setState(() {
+                                        showPassword = !showPassword;
+                                      });
+                                    },
                                   ),
                                 ),
                                 validator: (text) {
                                   if (text!.isEmpty) {
-                                    return 'Field cannot be null';
+                                    return 'Field cannot be empty';
                                   }
                                   if (text.length < 8) {
                                     return 'Password must be at least 8 characters';
@@ -263,8 +293,8 @@ class _Signin extends State<Signin> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               SizedBox(
-                                height: 50,
                                 width: 120,
+                                height: 50,
                                 child: ElevatedButton(
                                   onPressed: isLoading ? null : _handleLogin,
                                   style: ElevatedButton.styleFrom(
@@ -288,14 +318,13 @@ class _Signin extends State<Signin> {
                                       fontWeight: FontWeight.w800,
                                       color: primary,
                                     ),
-                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
                               const SizedBox(width: 5),
                               SizedBox(
-                                height: 50,
                                 width: 220,
+                                height: 50,
                                 child: ElevatedButton(
                                   onPressed: isLoading
                                       ? null
@@ -316,16 +345,14 @@ class _Signin extends State<Signin> {
                                           width: 2, color: yesBorderColor),
                                     ),
                                   ),
-                                  child: FittedBox(
-                                    child: Text(
-                                      'Do not have an account',
-                                      style: GoogleFonts.nunito(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: primary,
-                                      ),
-                                      textAlign: TextAlign.center,
+                                  child: Text(
+                                    'Do not have an account',
+                                    style: GoogleFonts.nunito(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: primary,
                                     ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),

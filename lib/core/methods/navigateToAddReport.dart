@@ -9,7 +9,7 @@ Future<void> navigateToAddReport(BuildContext context) async {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddReport(patientId: int.parse(savedPatientId)),
+        builder: (context) => AddReport(patientId: savedPatientId),
       ),
     );
   } else {

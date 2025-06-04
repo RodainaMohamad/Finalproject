@@ -1,19 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/services/DeletePatient_service.dart';
+import 'package:grad_project/core/widgets/EditReport.dart';
+import 'package:grad_project/core/widgets/addreport.dart';
 import '../../API_integration/models/patientmodel.dart';
-import 'addreport.dart';
+import '../../API_integration/models/PatientByIdModel.dart';
 
-class PatientCardWidget extends StatelessWidget {
+class PatientCardWidget extends StatefulWidget {
   final Patient patient;
   final int index;
   final VoidCallback? onDeleted;
+  final String? reportId;
+  final String? initialReportDetails;
+  final DateTime? initialReportDate;
+  final VoidCallback? onReportUpdated;
+  final List<Report>? reports;
 
   const PatientCardWidget({
     Key? key,
     required this.patient,
     required this.index,
     this.onDeleted,
+    this.reportId,
+    this.initialReportDetails,
+    this.initialReportDate,
+    this.onReportUpdated,
+    this.reports,
   }) : super(key: key);
+
+  @override
+  _PatientCardWidgetState createState() => _PatientCardWidgetState();
+}
+
+class _PatientCardWidgetState extends State<PatientCardWidget> {
+  Report? _selectedReport;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.reportId != null &&
+        widget.initialReportDetails != null &&
+        widget.initialReportDate != null) {
+      _selectedReport = Report(
+        id: int.tryParse(widget.reportId!),
+        reportDetails: widget.initialReportDetails,
+        uploadDate: widget.initialReportDate!.toIso8601String(),
+      );
+    } else if (widget.reports != null && widget.reports!.isNotEmpty) {
+      _selectedReport = widget.reports!.reduce((a, b) {
+        final aDate = DateTime.tryParse(a.uploadDate ?? '');
+        final bDate = DateTime.tryParse(b.uploadDate ?? '');
+        if (aDate == null || bDate == null) return a;
+        return aDate.isAfter(bDate) ? a : b;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +86,7 @@ class PatientCardWidget extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(3),
                     child: Image.network(
-                      patient.profileImage ?? '',
+                      widget.patient.profileImage ?? '',
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) =>
                       const Icon(Icons.person, color: Colors.white),
@@ -60,7 +100,7 @@ class PatientCardWidget extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        patient.name ?? 'Unknown',
+                        widget.patient.name ?? 'Unknown',
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -70,7 +110,7 @@ class PatientCardWidget extends StatelessWidget {
                         maxLines: 1,
                       ),
                       Text(
-                        'SSN: ${patient.ssn ?? 'N/A'} • Age: 25',
+                        'SSN: ${widget.patient.ssn ?? 'N/A'} • Age: 25',
                         style: TextStyle(
                           color: Colors.white70,
                           fontSize: cardHeight * 0.09,
@@ -136,7 +176,22 @@ class PatientCardWidget extends StatelessWidget {
                                                 ),
                                                 child: AddReport(
                                                   patientId:
-                                                  patient.id ?? index + 1,
+                                                  widget.patient.id ??
+                                                      widget.index + 1,
+                                                  onReportAdded: (newReport) {
+                                                    widget.onReportUpdated
+                                                        ?.call(); // Trigger update
+                                                    ScaffoldMessenger.of(
+                                                        context)
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Report added successfully'),
+                                                        backgroundColor:
+                                                        Colors.green,
+                                                      ),
+                                                    );
+                                                  },
                                                 ),
                                               ),
                                             );
@@ -167,7 +222,8 @@ class PatientCardWidget extends StatelessWidget {
                               ),
                             ),
                             _buildPatientStatus(
-                                patient.status ?? 'Unknown', cardHeight * 0.25),
+                                widget.patient.status ?? 'Unknown',
+                                cardHeight * 0.25),
                           ],
                         ),
                       ),
@@ -187,7 +243,7 @@ class PatientCardWidget extends StatelessWidget {
                         builder: (context) => AlertDialog(
                           title: const Text('Confirm Deletion'),
                           content: Text(
-                              'Are you sure you want to delete ${patient.name}?'),
+                              'Are you sure you want to delete ${widget.patient.name}?'),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
@@ -205,21 +261,19 @@ class PatientCardWidget extends StatelessWidget {
                         try {
                           final deleteService = DeletePatientService();
                           const String token = "YOUR_AUTH_TOKEN_HERE";
-                          print('Deleting patient with ID: ${patient.id ?? index + 1}');
                           await deleteService.deletePatient(
-                            patient.id ?? index + 1,
+                            widget.patient.id ?? widget.index + 1,
                             token: token,
                           );
-                          onDeleted?.call();
+                          widget.onDeleted?.call();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content:
-                              Text('${patient.name} deleted successfully'),
+                              content: Text(
+                                  '${widget.patient.name} deleted successfully'),
                               backgroundColor: Colors.green,
                             ),
                           );
                         } catch (e) {
-                          print('Error in PatientCardWidget: $e');
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Failed to delete patient: $e'),
@@ -229,7 +283,104 @@ class PatientCardWidget extends StatelessWidget {
                         }
                       }
                     } else if (value == 'edit') {
-                      // Implement edit functionality
+                      if (widget.reports == null || widget.reports!.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('No report available to edit'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text('Select Report to Edit'),
+                            content: StatefulBuilder(
+                              builder: (context, setState) {
+                                return DropdownButton<Report>(
+                                  isExpanded: true,
+                                  value: _selectedReport,
+                                  hint: const Text('Select a report'),
+                                  items: widget.reports!.map((report) {
+                                    return DropdownMenuItem<Report>(
+                                      value: report,
+                                      child: Text(
+                                        'Report ${report.id}: ${report.reportDetails ?? 'No details'}',
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (Report? newValue) {
+                                    setState(() {
+                                      _selectedReport = newValue;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  if (_selectedReport != null) {
+                                    Navigator.pop(context);
+                                    showModalBottomSheet(
+                                      context: context,
+                                      backgroundColor: Colors.transparent,
+                                      builder: (context) {
+                                        return Center(
+                                          child: Container(
+                                            width: screenWidth * 0.9,
+                                            padding: const EdgeInsets.all(16),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xff2C999B),
+                                              borderRadius:
+                                              BorderRadius.circular(25),
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: EditReport(
+                                              patientId: widget.patient.id ??
+                                                  widget.index + 1,
+                                              reportId:
+                                              _selectedReport!.id!.toString(),
+                                              initialReportDetails:
+                                              _selectedReport!.reportDetails ??
+                                                  '',
+                                              initialDate: DateTime.parse(
+                                                  _selectedReport!.uploadDate!),
+                                              onReportUpdated: (updatedReport) {
+                                                widget.onReportUpdated?.call();
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                        'Report updated successfully'),
+                                                    backgroundColor: Colors.green,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  }
+                                },
+                                child: const Text('Edit'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
                     }
                   },
                   itemBuilder: (context) => [
@@ -243,16 +394,17 @@ class PatientCardWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Text(
-                        'Edit',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: cardHeight * 0.14,
+                    if (widget.reports != null && widget.reports!.isNotEmpty)
+                      PopupMenuItem(
+                        value: 'edit',
+                        child: Text(
+                          'Edit Report',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: cardHeight * 0.14,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                   child: SizedBox(
                     width: cardHeight * 0.15,

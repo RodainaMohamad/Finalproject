@@ -64,6 +64,11 @@ class AuthUtils {
     return id != null ? int.tryParse(id) : null;
   }
 
+  static Future<void> clearPatientId() async {
+    await _storage.delete(key: _keyPatientId);
+    print('DEBUG: Patient ID cleared');
+  }
+
   static Future<void> clearToken() async {
     await _storage.deleteAll();
     print('DEBUG: Storage cleared');

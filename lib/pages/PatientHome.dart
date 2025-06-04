@@ -6,6 +6,7 @@ import 'package:grad_project/API_integration/models/PatientByIdModel.dart';
 import 'package:grad_project/API_integration/services/GetReport_service.dart';
 import 'package:grad_project/API_integration/services/PatientByIdService.dart';
 import 'package:grad_project/API_integration/services/PatientByName_service.dart';
+import 'package:grad_project/API_integration/services/VitalData_service.dart';
 import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
@@ -19,6 +20,7 @@ import 'package:grad_project/cubits/MQTT__Temp_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_states.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
 import 'package:grad_project/cubits/OxygenRate_states.dart';
+import 'dart:async'; // For Timer
 
 class PatientHome extends StatefulWidget {
   static const String routeName = 'PatientHome';
@@ -34,11 +36,24 @@ class _PatientHomeState extends State<PatientHome> {
   late Future<void> _loadUserInfoFuture;
   int? _patientId;
   PatientByIdModel? _patientDetails;
+  bool hasNotification = false; // Initialize as false
+  Timer? _notificationTimer; // For periodic checks
 
   @override
   void initState() {
     super.initState();
     _loadUserInfoFuture = _loadUserInfo();
+    _checkForNotifications(); // Initial check
+    // Periodically check for new notifications every 30 seconds
+    _notificationTimer = Timer.periodic(Duration(seconds: 30), (timer) {
+      _checkForNotifications();
+    });
+  }
+
+  @override
+  void dispose() {
+    _notificationTimer?.cancel(); // Clean up timer
+    super.dispose();
   }
 
   Future<void> _loadUserInfo() async {
@@ -58,11 +73,37 @@ class _PatientHomeState extends State<PatientHome> {
         if (name == null) {
           throw Exception('No patient name found in storage');
         }
-        _patientId = await PatientByNameService().getPatientIdByName(name);
+        final patientId = await PatientByNameService().getPatientIdByName(name);
+        if (patientId == null) {
+          print('DEBUG: No patient found for name: $name');
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('No patient found. Please contact support.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            AuthUtils.clearToken();
+            Navigator.pushReplacementNamed(context, 'Signin');
+          });
+          return;
+        }
+        _patientId = patientId;
+        await AuthUtils.savePatientId(patientId);
+        print('DEBUG: Patient ID retrieved: $_patientId');
       } catch (e) {
         print('DEBUG: Failed to fetch patient ID: $e');
-        _patientId = 1051; // Fallback for testing
-        await AuthUtils.savePatientId(_patientId!);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to load patient ID: $e'),
+              backgroundColor: Colors.red,
+            ),
+          );
+          AuthUtils.clearToken();
+          Navigator.pushReplacementNamed(context, 'Signin');
+        });
+        return;
       }
     }
 
@@ -71,6 +112,81 @@ class _PatientHomeState extends State<PatientHome> {
       print('DEBUG: Patient details loaded: ${_patientDetails?.id}');
     } catch (e) {
       print('DEBUG: Failed to load patient details: $e');
+    }
+
+    print('DEBUG: Patient name retrieved: ${widget.patientName}');
+  }
+
+  Future<void> _checkForNotifications() async {
+    try {
+      final tips = await VitalService().fetchHealthTips();
+      setState(() {
+        hasNotification = tips.isNotEmpty && tips[0] != 'No health tips available yet.' && tips[0] != 'Error fetching health tips.';
+      });
+    } catch (e) {
+      print('Error checking notifications: $e');
+    }
+  }
+
+  void _showNotificationsDialog(BuildContext context) async {
+    try {
+      final tips = await VitalService().fetchHealthTips();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Health Recommendations',
+              style: GoogleFonts.nunito(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: secondary,
+              ),
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: tips.isEmpty
+                  ? Text(
+                'No recommendations available.',
+                style: GoogleFonts.nunito(fontSize: 16, color: secondary),
+              )
+                  : ListView.builder(
+                shrinkWrap: true,
+                itemCount: tips.length,
+                itemBuilder: (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Text(
+                      '• ${tips[index]}',
+                      style: GoogleFonts.nunito(fontSize: 16, color: secondary),
+                    ),
+                  );
+                },
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text(
+                  'Close',
+                  style: GoogleFonts.nunito(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: primary,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to load recommendations: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -82,7 +198,6 @@ class _PatientHomeState extends State<PatientHome> {
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
     ];
-    bool hasNotification = true;
 
     return FutureBuilder(
       future: _loadUserInfoFuture,
@@ -181,7 +296,7 @@ class _PatientHomeState extends State<PatientHome> {
                                   if (index == 0) {
                                     showMenuDialog(context);
                                   } else {
-                                    print('Notifications not implemented yet');
+                                    _showNotificationsDialog(context); // Show dialog with tips
                                   }
                                 },
                                 child: Stack(
@@ -261,6 +376,7 @@ class _PatientHomeState extends State<PatientHome> {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {
+                      await _checkForNotifications(); // Refresh notifications
                       setState(() {});
                     },
                     child: SingleChildScrollView(
@@ -315,7 +431,7 @@ class _PatientHomeState extends State<PatientHome> {
                           FutureBuilder<List<GetReportModel>>(
                             future: _patientId != null
                                 ? GetReportService().getReports(_patientId!)
-                                : Future.error('Patient ID not loaded'),
+                                : Future.value([]),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return const CustomExpansionTile(

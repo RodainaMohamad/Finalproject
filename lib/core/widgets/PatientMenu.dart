@@ -4,7 +4,6 @@ import 'package:grad_project/core/widgets/addDoctor.dart';
 import 'package:grad_project/core/widgets/addguardian.dart';
 
 class Menu extends StatelessWidget {
-
   const Menu({Key? key}) : super(key: key);
 
   @override

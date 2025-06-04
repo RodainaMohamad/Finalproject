@@ -6,7 +6,9 @@ class Patient {
   final String? ssn;
   final String? profileImage;
   final String? status;
-  final int? reportId;
+  final String? reportId;
+  final String? reportDetails;
+  final DateTime? reportDate;
 
   Patient({
     this.id,
@@ -15,6 +17,8 @@ class Patient {
     this.profileImage,
     this.status,
     this.reportId,
+    this.reportDetails,
+    this.reportDate,
   });
 
   factory Patient.fromAddPatientModel(dynamic model, int index) {
@@ -25,7 +29,7 @@ class Patient {
         ssn: model.ssn,
         profileImage: model.profileImage ?? '',
         status: model.status,
-        reportId: model.reportId,
+        reportId: model.reportId?.toString(), // Convert int? to String?
       );
     } else if (model is Map<String, dynamic>) {
       return Patient(
@@ -34,9 +38,7 @@ class Patient {
         ssn: model['ssn']?.toString(),
         profileImage: model['profileImage']?.toString() ?? '',
         status: model['status']?.toString(),
-        reportId: model['reportId'] != null
-            ? int.tryParse(model['reportId'].toString())
-            : null,
+        reportId: model['reportId']?.toString(), // Ensure String? type
       );
     } else {
       throw Exception('Unsupported model type: ${model.runtimeType}');

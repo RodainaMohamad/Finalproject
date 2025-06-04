@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:grad_project/API_integration/models/AddReportModel.dart';
 import 'package:grad_project/API_integration/models/PatientByIdModel.dart';
 import 'package:grad_project/API_integration/models/patientmodel.dart';
-import 'package:grad_project/API_integration/services/PatientByIdService.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:grad_project/API_integration/services/PatientIdDetails_service.dart';
 import 'package:grad_project/core/widgets/patiencard.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'addpatient.dart';
 
 class PatientsScreen extends StatefulWidget {
@@ -16,7 +17,7 @@ class PatientsScreen extends StatefulWidget {
 
 class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObserver {
   bool _isExpanded = false;
-  final PatientByIdService _patientService = PatientByIdService();
+  final PatientIdDetailsService _patientService = PatientIdDetailsService();
   List<PatientByIdModel> _allPatients = [];
   List<PatientByIdModel> _displayedPatients = [];
   final TextEditingController _searchController = TextEditingController();
@@ -24,7 +25,7 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
   bool _prefsError = false;
   late SharedPreferences _prefs;
   bool _prefsInitialized = false;
-  List<int> _knownPatientIds = []; // Track known patient IDs
+  List<int> _knownPatientIds = [];
 
   @override
   void initState() {
@@ -37,8 +38,8 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
 
   Future<void> _initializeApp() async {
     await _initSharedPreferences();
-    await _loadKnownPatientIds(); // Load previously known IDs
-    await _loadAllPatients(); // Load all patients
+    await _loadKnownPatientIds();
+    await _loadAllPatients();
   }
 
   Future<void> _initSharedPreferences() async {
@@ -73,23 +74,20 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
       List<PatientByIdModel> loadedPatients = [];
       List<int> successfulIds = [];
 
-      // Try loading each known patient
       for (int id in _knownPatientIds) {
         try {
           final patient = await _patientService.getPatientById(id);
           loadedPatients.add(patient);
           successfulIds.add(id);
-          print('Successfully loaded patient $id');
+          print('Successfully loaded patient $id with ${patient.reports?.length ?? 0} reports');
         } catch (e) {
           print('Error loading patient $id: $e');
         }
       }
 
-      // Check for new patients by trying incremental IDs
       int nextId = _knownPatientIds.isEmpty ? 1 : (_knownPatientIds.reduce((a, b) => a > b ? a : b) + 1);
       int newPatientsFound = 0;
 
-      // Limit to checking 10 new possible IDs to avoid infinite loops
       for (int i = 0; i < 10; i++) {
         try {
           final patient = await _patientService.getPatientById(nextId + i);
@@ -98,18 +96,19 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
           newPatientsFound++;
           print('Discovered new patient ${patient.id}');
         } catch (e) {
-          // Expected when patient doesn't exist
+          print('Error discovering patient ${nextId + i}: $e');
         }
       }
+
       setState(() {
         _allPatients = loadedPatients;
         _displayedPatients = List.from(_allPatients);
-        _knownPatientIds = successfulIds.toSet().toList(); // Ensure unique IDs
+        _knownPatientIds = successfulIds.toSet().toList();
       });
 
       if (_prefsInitialized) {
-        await _prefs.setStringList('knownPatientIds',
-            _knownPatientIds.map((id) => id.toString()).toList());
+        await _prefs.setStringList(
+            'knownPatientIds', _knownPatientIds.map((id) => id.toString()).toList());
         await _savePatientsLocally();
       }
 
@@ -120,8 +119,7 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
     } catch (e) {
       print('Error loading all patients: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error loading patients. Showing cached data.'))
-      );
+          const SnackBar(content: Text('Error loading patients. Showing cached data.')));
     } finally {
       setState(() => _isLoading = false);
     }
@@ -149,6 +147,34 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
         patient.name?.toLowerCase().contains(query.toLowerCase()) ?? false)
             .toList();
       });
+    }
+  }
+
+  void _updateReportData(int patientId, AddReportModel newReport) {
+    setState(() {
+      final patientIndex = _allPatients.indexWhere((p) => p.id == patientId);
+      if (patientIndex != -1) {
+        final newReportData = Report(
+          id: newReport.id,
+          uploadDate: newReport.uploadDate,
+          reportDetails: newReport.reportDetails,
+        );
+        _allPatients[patientIndex].reports ??= [];
+        _allPatients[patientIndex].reports!.add(newReportData);
+        _displayedPatients = List.from(_allPatients);
+      }
+    });
+    if (_prefsInitialized) {
+      _savePatientsLocally();
+    }
+  }
+
+  void _onReportUpdated(int patientId) {
+    setState(() {
+      _displayedPatients = List.from(_allPatients);
+    });
+    if (_prefsInitialized) {
+      _savePatientsLocally();
     }
   }
 
@@ -227,10 +253,10 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('No patients found'),
+                    const Text('No patients found'),
                     ElevatedButton(
                       onPressed: _loadAllPatients,
-                      child: Text('Retry'),
+                      child: const Text('Retry'),
                     ),
                   ],
                 ),
@@ -248,6 +274,17 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                   itemCount: _displayedPatients.length,
                   itemBuilder: (context, index) {
                     final patient = _displayedPatients[index];
+                    final latestReport = patient.reports != null &&
+                        patient.reports!.isNotEmpty
+                        ? patient.reports!.reduce((a, b) {
+                      final aDate =
+                      DateTime.tryParse(a.uploadDate ?? '');
+                      final bDate =
+                      DateTime.tryParse(b.uploadDate ?? '');
+                      if (aDate == null || bDate == null) return a;
+                      return aDate.isAfter(bDate) ? a : b;
+                    })
+                        : null;
                     return PatientCardWidget(
                       patient: Patient(
                         id: patient.id,
@@ -255,12 +292,17 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                         ssn: patient.ssn,
                         profileImage: patient.profileImage,
                         status: patient.status,
-                        reportId: patient.reportId,
+                        reportId: latestReport?.id?.toString(),
+                        reportDetails: latestReport?.reportDetails,
+                        reportDate: latestReport?.uploadDate != null
+                            ? DateTime.tryParse(latestReport!.uploadDate!)
+                            : null,
                       ),
                       index: index,
                       onDeleted: () async {
                         setState(() {
-                          _allPatients.removeWhere((p) => p.id == patient.id);
+                          _allPatients
+                              .removeWhere((p) => p.id == patient.id);
                           _displayedPatients = List.from(_allPatients);
                           _knownPatientIds.remove(patient.id);
                         });
@@ -270,6 +312,13 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                               _knownPatientIds.map((id) => id.toString()).toList());
                         }
                       },
+                      reportId: latestReport?.id?.toString(),
+                      initialReportDetails: latestReport?.reportDetails,
+                      initialReportDate: latestReport?.uploadDate != null
+                          ? DateTime.tryParse(latestReport!.uploadDate!)
+                          : null,
+                      onReportUpdated: () => _onReportUpdated(patient.id!),
+                      reports: patient.reports,
                     );
                   },
                 ),
@@ -290,7 +339,6 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                 ),
                 child: AddPatientScreen(
                   onPatientAdded: (newPatient) async {
-                    // First add to local state
                     setState(() {
                       final patient = PatientByIdModel.fromJson(newPatient.toJson());
                       _allPatients.add(patient);
@@ -299,17 +347,13 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                         _knownPatientIds.add(patient.id!);
                       }
                     });
-
-                    // Then save locally
                     if (_prefsInitialized) {
                       await _savePatientsLocally();
                       await _prefs.setStringList('knownPatientIds',
                           _knownPatientIds.map((id) => id.toString()).toList());
                     }
-
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Patient added successfully!'))
-                    );
+                        const SnackBar(content: Text('Patient added successfully!')));
                   },
                 ),
               );
