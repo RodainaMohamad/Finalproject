@@ -20,7 +20,9 @@ import 'package:grad_project/cubits/MQTT__Temp_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_states.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
 import 'package:grad_project/cubits/OxygenRate_states.dart';
-import 'dart:async'; // For Timer
+import 'dart:async';
+
+import 'package:grad_project/pages/QRScanner.dart';
 
 class PatientHome extends StatefulWidget {
   static const String routeName = 'PatientHome';
@@ -65,7 +67,6 @@ class _PatientHomeState extends State<PatientHome> {
       });
       return;
     }
-
     _patientId = await AuthUtils.getPatientId();
     if (_patientId == null) {
       try {
@@ -106,7 +107,6 @@ class _PatientHomeState extends State<PatientHome> {
         return;
       }
     }
-
     try {
       _patientDetails = await PatientByIdService().getPatientById(_patientId!);
       print('DEBUG: Patient details loaded: ${_patientDetails?.id}');
@@ -197,8 +197,8 @@ class _PatientHomeState extends State<PatientHome> {
     final icons = [
       Icons.menu_rounded,
       Icons.notifications_none_rounded,
+      Icons.qr_code_scanner_rounded,
     ];
-
     return FutureBuilder(
       future: _loadUserInfoFuture,
       builder: (context, snapshot) {
@@ -295,8 +295,14 @@ class _PatientHomeState extends State<PatientHome> {
                                 onTap: () {
                                   if (index == 0) {
                                     showMenuDialog(context);
-                                  } else {
+                                  } else if (index == 1){
                                     _showNotificationsDialog(context); // Show dialog with tips
+                                  }
+                                  else{
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => QRScannerPage()),
+                                    );
                                   }
                                 },
                                 child: Stack(

@@ -8,6 +8,7 @@ import 'package:grad_project/cubits/auth_events.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
 import 'package:grad_project/pages/Doctorhome.dart';
 import 'package:grad_project/pages/PatientHome.dart';
+import 'package:grad_project/pages/QRScanner.dart';
 import 'package:grad_project/pages/SignIn.dart';
 import 'package:grad_project/pages/SplashScreen.dart';
 import 'package:grad_project/pages/create_account_doctor.dart';
@@ -18,7 +19,7 @@ void main() {
 }
 
 void testStorage() async {
-  final storage = FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
   try {
     await storage.write(key: 'test_key', value: 'test_value');
     final value = await storage.read(key: 'test_key');
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         initialRoute: "Signin",
         routes: {
           'Splashscreen': (context) => const Splashscreen(),
-          'CreateAccountScreenPatient': (context) => CreateAccountScreenPatient(),
+          'CreateAccountScreenPatient': (context) => const CreateAccountScreenPatient(),
           'Signin': (context) => const Signin(),
           'DoctorPatient': (context) => const DoctorPatient(),
           'PatientHome': (context) {
@@ -60,7 +61,8 @@ class MyApp extends StatelessWidget {
               doctorName: args['doctorName'] as String,
             );
           },
-          'CreateAccountScreenDoctor': (context) => CreateAccountScreenDoctor(),
+          'CreateAccountScreenDoctor': (context) => const CreateAccountScreenDoctor(),
+          'QRScannerPage': (context) =>  QRScannerPage(),
         },
       ),
     );
