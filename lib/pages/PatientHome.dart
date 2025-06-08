@@ -14,6 +14,8 @@ import 'package:grad_project/core/widgets/HomeBottomBar.dart';
 import 'package:grad_project/core/widgets/expansionTile.dart';
 import 'package:grad_project/core/widgets/PatientMenu.dart';
 import 'package:grad_project/core/widgets/statusCards.dart';
+import 'package:grad_project/cubits/HealthStatusEvents.dart';
+import 'package:grad_project/cubits/HealthStatusState.dart';
 import 'package:grad_project/cubits/HeartRate_events.dart';
 import 'package:grad_project/cubits/HeartRate_states.dart';
 import 'package:grad_project/cubits/MQTT__Temp_events.dart';
@@ -370,8 +372,21 @@ class _PatientHomeState extends State<PatientHome> {
                               ),
                             ),
                             const SizedBox(height: 10),
-                            AnimatedStatusIndicator(
-                              item: StatusItemData(label: "Very Good"),
+                            BlocBuilder<HealthStatusCubit, HealthStatusState>(
+                              builder: (context, state) {
+                                if (state.statusItemData.label == 'Unknown') {
+                                  return Text(
+                                    'Waiting for data...',
+                                    style: TextStyle(
+                                      color: secondary,
+                                      fontSize: 15,
+                                    ),
+                                  );
+                                }
+                                return AnimatedStatusIndicator(
+                                  item: state.statusItemData,
+                                );
+                              },
                             ),
                           ],
                         ),

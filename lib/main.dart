@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:grad_project/cubits/HealthStatusEvents.dart';
 import 'package:grad_project/cubits/HeartRate_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_events.dart';
 import 'package:grad_project/cubits/OxygenRate_events.dart';
@@ -40,6 +41,13 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => HeartRateCubit()),
         BlocProvider(create: (context) => TemperatureCubit()),
         BlocProvider(create: (context) => OxygenRateCubit()),
+        BlocProvider(
+          create: (context) => HealthStatusCubit(
+            heartRateCubit: context.read<HeartRateCubit>(),
+            temperatureCubit: context.read<TemperatureCubit>(),
+            oxygenRateCubit: context.read<OxygenRateCubit>(),
+          ),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

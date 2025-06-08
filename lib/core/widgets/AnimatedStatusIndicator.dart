@@ -122,14 +122,15 @@ class StatusItemData {
           end: Alignment.bottomRight);
     } else if (lowerLabel == 'bad') {
       gradient = const LinearGradient(
-          colors: [Color(0xFFFF0000), Color(0xFF0EF816), Color(0xFFFBC204)],
-          begin: Alignment.topLeft,
+          colors: [Color(0xFFFF0000), Color(0xFFFBC204)],
+          begin: Alignment.topRight,
           end: Alignment.bottomRight);
     } else if (lowerLabel == 'very bad') {
-      gradient = const LinearGradient(
-          colors: [Color(0xFFFF0000), Color(0xFFFBC204)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight);
+      const Color(0xFFFF0000);
+      // gradient = const LinearGradient(
+      //     colors: [Color(0xFFFF0000), Color(0xFFFBC204)],
+      //     begin: Alignment.topLeft,
+      //     end: Alignment.bottomRight);
     } else {
       gradient = const LinearGradient(colors: [Colors.grey, Colors.grey]);
     }
