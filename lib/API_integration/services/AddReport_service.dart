@@ -4,8 +4,9 @@ import '../models/AddReportModel.dart';
 
 class AddReportService {
   Future<AddReportModel> addReport({
-    required String reportDetails,
+    required String diagnosis,
     required String uploadDate,
+    String? medication,
     required int patientId,
     int? medicalStaffId,
   }) async {
@@ -16,14 +17,15 @@ class AddReportService {
     };
     final body = jsonEncode({
       'uploadDate': uploadDate,
-      'reportDetails': reportDetails,
+      'diagnosis': diagnosis,
       'patientId': patientId,
+      if (medication != null && medication.isNotEmpty) 'medication': medication,
       if (medicalStaffId != null) 'medicalStaffId': medicalStaffId,
     });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
-      if (response.statusCode == 200) {
+      if (response.statusCode == 200 || response.statusCode == 201) {
         final jsonResponse = jsonDecode(response.body);
         return AddReportModel.fromJson(jsonResponse);
       } else {

@@ -1,21 +1,22 @@
-import 'dart:convert';
-
 class Report {
   final int? id;
   final String? uploadDate;
-  final String? reportDetails;
+  final String? medication;
+  final String? diagnosis;
 
   Report({
     this.id,
     this.uploadDate,
-    this.reportDetails,
+    this.medication,
+    this.diagnosis,
   });
 
   factory Report.fromJson(Map<String, dynamic> json) {
     return Report(
       id: json['id'] as int?,
       uploadDate: json['uploadDate'] as String?,
-      reportDetails: json['reportDetails'] as String?,
+      diagnosis: json['diagnosis'] as String?,
+      medication: json['medication'] as String?,
     );
   }
 
@@ -23,7 +24,8 @@ class Report {
     return {
       'id': id,
       'uploadDate': uploadDate,
-      'reportDetails': reportDetails,
+      'diagnosis': diagnosis,
+      'medication': medication,
     };
   }
 
@@ -34,10 +36,11 @@ class Report {
               runtimeType == other.runtimeType &&
               id == other.id &&
               uploadDate == other.uploadDate &&
-              reportDetails == other.reportDetails;
+              diagnosis == other.diagnosis &&
+              medication == other.medication;
 
   @override
-  int get hashCode => id.hashCode ^ uploadDate.hashCode ^ reportDetails.hashCode;
+  int get hashCode => id.hashCode ^ uploadDate.hashCode ^ diagnosis.hashCode ^ medication.hashCode;
 }
 
 class PatientByIdModel {
@@ -49,7 +52,7 @@ class PatientByIdModel {
   final String? phoneNumber;
   final List<dynamic>? guardians;
   final String? medicalHistory;
-   List<Report>? reports;
+  List<Report>? reports;
   String? profileImage;
   String? status;
 
@@ -80,7 +83,7 @@ class PatientByIdModel {
       reports: json['reports']?['\$values'] != null
           ? (json['reports']['\$values'] as List)
           .map((report) => Report.fromJson(report))
-          .toSet() // Remove duplicates
+          .toSet()
           .toList()
           : null,
       profileImage: json['profileImage'] as String?,

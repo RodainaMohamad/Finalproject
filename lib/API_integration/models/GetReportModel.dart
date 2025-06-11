@@ -1,27 +1,31 @@
 class GetReportModel {
-  final int id;
-  final String uploadDate;
-  final String reportDetails;
+  final int? id;
+  final String? uploadDate;
+  final String? diagnosis;
+  final String? medication;
 
   GetReportModel({
-    required this.id,
-    required this.uploadDate,
-    required this.reportDetails,
+    this.id,
+    this.uploadDate,
+    this.diagnosis,
+    this.medication,
   });
 
   factory GetReportModel.fromJson(Map<String, dynamic> json) {
     return GetReportModel(
-      id: json['id'],
-      uploadDate: json['uploadDate'],
-      reportDetails: json['reportDetails'],
+      id: json['id'] as int?,
+      uploadDate: json['uploadDate'] as String?,
+      diagnosis: json['diagnosis'] as String?,
+      medication: json['medication'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-    'id': id,
-    'uploadDate': uploadDate,
-    'reportDetails': reportDetails,
-  };
+      'id': id,
+      'uploadDate': uploadDate,
+      'diagnosis': diagnosis,
+      'medication': medication,
+    };
   }
 }

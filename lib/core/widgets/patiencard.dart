@@ -10,7 +10,7 @@ class PatientCardWidget extends StatefulWidget {
   final int index;
   final VoidCallback? onDeleted;
   final String? reportId;
-  final String? initialReportDetails;
+  final String? initialDiagnosis;
   final DateTime? initialReportDate;
   final VoidCallback? onReportUpdated;
   final List<Report>? reports;
@@ -21,7 +21,7 @@ class PatientCardWidget extends StatefulWidget {
     required this.index,
     this.onDeleted,
     this.reportId,
-    this.initialReportDetails,
+    this.initialDiagnosis,
     this.initialReportDate,
     this.onReportUpdated,
     this.reports,
@@ -285,7 +285,7 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                               title: const Text('Select Report to Edit'),
                               content: StatefulBuilder(
                                 builder: (context, setState) {
-                                  print('Dropdown reports for patient ${widget.patient.id}: ${widget.reports!.map((r) => 'ID: ${r.id}, Details: ${r.reportDetails}').toList()}');
+                                  print('Dropdown reports for patient ${widget.patient.id}: ${widget.reports!.map((r) => 'ID: ${r.id}, Diagnosis: ${r.diagnosis}').toList()}');
                                   return DropdownButton<Report>(
                                     isExpanded: true,
                                     value: _selectedReport,
@@ -296,7 +296,7 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                                       return DropdownMenuItem<Report>(
                                         value: report,
                                         child: Text(
-                                          'Report ${report.id ?? index}: ${report.reportDetails?.substring(0, report.reportDetails!.length > 20 ? 20 : null) ?? 'No details'}...',
+                                          'Report ${report.id ?? index}: ${report.diagnosis?.substring(0, report.diagnosis!.length > 20 ? 20 : null) ?? 'No diagnosis'}...',
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       );
@@ -304,7 +304,7 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                                     onChanged: (Report? newValue) {
                                       setState(() {
                                         _selectedReport = newValue;
-                                        print('Selected report for patient ${widget.patient.id}: ID ${_selectedReport?.id}, Details: ${_selectedReport?.reportDetails}');
+                                        print('Selected report for patient ${widget.patient.id}: ID ${_selectedReport?.id}, Diagnosis: ${_selectedReport?.diagnosis}');
                                       });
                                     },
                                   );
@@ -342,7 +342,7 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                                                 reportId:
                                                 _selectedReport!.id!.toString(),
                                                 initialReportDetails:
-                                                _selectedReport!.reportDetails ??
+                                                _selectedReport!.diagnosis ??
                                                     '',
                                                 initialDate: DateTime.parse(
                                                     _selectedReport!.uploadDate!),

@@ -1,7 +1,7 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:grad_project/API_integration/models/GetReportModel.dart';
-import 'package:grad_project/API_integration/utility.dart';
+import '../models/GetReportModel.dart';
+import '../utility.dart';
 
 class GetReportService {
   Future<List<GetReportModel>> getReports(int patientId) async {
@@ -12,34 +12,37 @@ class GetReportService {
       }
 
       final response = await http.get(
-        Uri.parse('http://nabdapi.runasp.net/api/Patient/$patientId/Reports'),
+        Uri.parse('http://nabdapi.runasp.net/api/Report/patient/$patientId'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
         },
       );
 
-      print('GET Reports Request: URL=http://nabdapi.runasp.net/api/Patient/$patientId/Reports');
-      print('GET Reports Response: Status=${response.statusCode}, Body=${response.body}');
+      // Log response
+      print('GET Reports Response: Status=${response.statusCode}, Headers=${response.headers}, Body=${response.body.length > 100 ? response.body.substring(0, 100) : response.body}');
 
+      final contentType = response.headers['content-type']?.toLowerCase() ?? '';
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data is Map<String, dynamic> && data.containsKey('\$values')) {
-          final List<dynamic> reportsJsonList = data['\$values'];
-          return reportsJsonList.map((item) => GetReportModel.fromJson(item)).toList();
+        if (contentType.contains('application/json')) {
+          final data = jsonDecode(response.body);
+          final reports = (data['\$values'] as List)
+              .map((report) => GetReportModel.fromJson(report))
+              .toList();
+          return reports;
         } else {
-          throw Exception('Unexpected data format: Expected a map with "\$values"');
+          throw Exception('Unexpected content-type: $contentType. Expected JSON.');
         }
       } else if (response.statusCode == 401) {
-        throw Exception('Unauthorized: Invalid or expired token.');
+        throw Exception('Authentication failed: Invalid or expired token.');
       } else if (response.statusCode == 404) {
-        throw Exception('No reports found for patient ID: $patientId');
+        return [];
       } else {
         throw Exception('Failed to fetch reports: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       print('Error fetching reports for patientId $patientId: $e');
-      throw Exception('Error fetching reports: $e');
+      rethrow;
     }
   }
 }

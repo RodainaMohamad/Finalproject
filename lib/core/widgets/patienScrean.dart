@@ -132,8 +132,8 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
       final patientsJson = _allPatients.map((p) => jsonEncode(p.toJson())).toList();
       await _prefs.setStringList('patients', patientsJson);
     } catch (e) {
-      print('Error saving patients locally: $e');
-      setState(() => _prefsError = true);
+    print('Error saving patients locally: $e');
+    setState(() => _prefsError = true);
     }
   }
 
@@ -157,7 +157,8 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
         final newReportData = Report(
           id: newReport.id,
           uploadDate: newReport.uploadDate,
-          reportDetails: newReport.reportDetails,
+          diagnosis: newReport.diagnosis,
+          medication: newReport.medication,
         );
         _allPatients[patientIndex].reports ??= [];
         _allPatients[patientIndex].reports!.add(newReportData);
@@ -293,7 +294,7 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                         profileImage: patient.profileImage,
                         status: patient.status,
                         reportId: latestReport?.id?.toString(),
-                        reportDetails: latestReport?.reportDetails,
+                        reportDetails: latestReport?.diagnosis,
                         reportDate: latestReport?.uploadDate != null
                             ? DateTime.tryParse(latestReport!.uploadDate!)
                             : null,
@@ -313,7 +314,7 @@ class _PatientsScreenState extends State<PatientsScreen> with WidgetsBindingObse
                         }
                       },
                       reportId: latestReport?.id?.toString(),
-                      initialReportDetails: latestReport?.reportDetails,
+                      initialDiagnosis: latestReport?.diagnosis,
                       initialReportDate: latestReport?.uploadDate != null
                           ? DateTime.tryParse(latestReport!.uploadDate!)
                           : null,

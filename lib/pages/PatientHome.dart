@@ -40,15 +40,14 @@ class _PatientHomeState extends State<PatientHome> {
   late Future<void> _loadUserInfoFuture;
   int? _patientId;
   PatientByIdModel? _patientDetails;
-  bool hasNotification = false; // Initialize as false
-  Timer? _notificationTimer; // For periodic checks
+  bool hasNotification = false;
+  Timer? _notificationTimer;
 
   @override
   void initState() {
     super.initState();
     _loadUserInfoFuture = _loadUserInfo();
-    _checkForNotifications(); // Initial check
-    // Periodically check for new notifications every 30 seconds
+    _checkForNotifications();
     _notificationTimer = Timer.periodic(Duration(seconds: 30), (timer) {
       _checkForNotifications();
     });
@@ -56,7 +55,7 @@ class _PatientHomeState extends State<PatientHome> {
 
   @override
   void dispose() {
-    _notificationTimer?.cancel(); // Clean up timer
+    _notificationTimer?.cancel();
     super.dispose();
   }
 
@@ -297,10 +296,9 @@ class _PatientHomeState extends State<PatientHome> {
                                 onTap: () {
                                   if (index == 0) {
                                     showMenuDialog(context);
-                                  } else if (index == 1){
-                                    _showNotificationsDialog(context); // Show dialog with tips
-                                  }
-                                  else{
+                                  } else if (index == 1) {
+                                    _showNotificationsDialog(context);
+                                  } else {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(builder: (context) => QRScannerPage()),
@@ -397,7 +395,7 @@ class _PatientHomeState extends State<PatientHome> {
                 Expanded(
                   child: RefreshIndicator(
                     onRefresh: () async {
-                      await _checkForNotifications(); // Refresh notifications
+                      await _checkForNotifications();
                       setState(() {});
                     },
                     child: SingleChildScrollView(
@@ -500,8 +498,8 @@ class _PatientHomeState extends State<PatientHome> {
                                       itemBuilder: (context, index) {
                                         final report = reports[index];
                                         return ListTile(
-                                          title: Text(report.reportDetails ?? 'No details'),
-                                          subtitle: Text('Date: ${report.uploadDate.split('T').first}'),
+                                          title: Text(report.diagnosis ?? 'No details'),
+                                          subtitle: Text('Date: ${report.uploadDate?.split('T').first ?? 'Unknown'}'),
                                         );
                                       },
                                     ),
@@ -511,9 +509,75 @@ class _PatientHomeState extends State<PatientHome> {
                             },
                           ),
                           SizedBox(height: height * 0.03),
-                          const CustomExpansionTile(
-                            title: "My Medicine",
-                            content: Text("No this time."),
+                          FutureBuilder<List<GetReportModel>>(
+                            future: _patientId != null
+                                ? GetReportService().getReports(_patientId!)
+                                : Future.value([]),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                return const CustomExpansionTile(
+                                  title: "My Medicine",
+                                  content: Text("Loading..."),
+                                );
+                              } else if (snapshot.hasError) {
+                                final error = snapshot.error.toString();
+                                if (error.contains('401')) {
+                                  return CustomExpansionTile(
+                                    title: "My Medicine",
+                                    content: Text("Session expired. Please log in again."),
+                                    trailing: IconButton(
+                                      icon: const Icon(Icons.login),
+                                      onPressed: () {
+                                        AuthUtils.clearToken();
+                                        Navigator.pushReplacementNamed(context, 'Signin');
+                                      },
+                                    ),
+                                  );
+                                }
+                                return CustomExpansionTile(
+                                  title: "My Medicine",
+                                  content: Text(error.contains('404') ? "No medication prescribed." : "Error: $error"),
+                                  trailing: IconButton(
+                                    icon: const Icon(Icons.refresh),
+                                    onPressed: () => setState(() {}),
+                                  ),
+                                );
+                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return const CustomExpansionTile(
+                                  title: "My Medicine",
+                                  content: Text("No medication prescribed."),
+                                );
+                              } else {
+                                final reports = snapshot.data!;
+                                final medications = reports
+                                    .where((report) => report.medication != null && report.medication!.isNotEmpty)
+                                    .toList();
+                                if (medications.isEmpty) {
+                                  return const CustomExpansionTile(
+                                    title: "My Medicine",
+                                    content: Text("No medication prescribed."),
+                                  );
+                                }
+                                return CustomExpansionTile(
+                                  title: "My Medicine",
+                                  content: SizedBox(
+                                    height: 200,
+                                    child: ListView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: medications.length,
+                                      itemBuilder: (context, index) {
+                                        final report = medications[index];
+                                        return ListTile(
+                                          title: Text(report.medication ?? 'No medication'),
+                                          subtitle: Text('Date: ${report.uploadDate?.split('T').first ?? 'Unknown'}'),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
                           ),
                           SizedBox(height: height * 0.057),
                           BottomNavWidget(),
@@ -545,7 +609,7 @@ class _PatientHomeState extends State<PatientHome> {
     return state.heartRate!;
   }
 
-  String _getOxygenValue(OxygenRateState state) {
+ String _getOxygenValue(OxygenRateState state) {
     if (!state.isConnected) return "Connecting";
     if (state.error != null) return "Error";
     if (state.oxygenRate == null) return "--";

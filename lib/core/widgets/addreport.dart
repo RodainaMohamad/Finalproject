@@ -3,7 +3,6 @@ import 'package:grad_project/API_integration/models/AddReportModel.dart';
 import 'package:grad_project/API_integration/services/AddReport_service.dart';
 import 'package:intl/intl.dart';
 
-
 class AddReport extends StatefulWidget {
   final int patientId;
   final Function(AddReportModel)? onReportAdded;
@@ -21,6 +20,7 @@ class AddReport extends StatefulWidget {
 class _AddReportState extends State<AddReport> {
   final _formKey = GlobalKey<FormState>();
   final _reportDetailsController = TextEditingController();
+  final _medicationController=TextEditingController();
   DateTime? _selectedDate;
   final AddReportService _reportService = AddReportService();
   bool _isLoading = false;
@@ -50,9 +50,10 @@ class _AddReportState extends State<AddReport> {
       setState(() => _isLoading = true);
       try {
         final newReport = await _reportService.addReport(
-          reportDetails: _reportDetailsController.text.trim(),
+          diagnosis: _reportDetailsController.text.trim(),
           uploadDate: _selectedDate!.toUtc().toIso8601String(),
           patientId: widget.patientId,
+          medication: _medicationController.text.trim(),
           medicalStaffId: null,
         );
         if (widget.onReportAdded != null) {
@@ -119,6 +120,26 @@ class _AddReportState extends State<AddReport> {
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _medicationController,
+              decoration: InputDecoration(
+                labelText: 'Medication',
+                labelStyle: const TextStyle(color: Colors.white70),
+                filled: true,
+                fillColor: Colors.white.withOpacity(0.1),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: Colors.white),
+                ),
+              ),
+              style: const TextStyle(color: Colors.white),
+              maxLines: 2,
             ),
             const SizedBox(height: 16),
             GestureDetector(
