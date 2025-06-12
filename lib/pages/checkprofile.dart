@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../../API_integration/models/patientmodel.dart';
-import '../../cubits/HeartRate_events.dart';
-import '../../cubits/HeartRate_states.dart';
-import '../../cubits/MQTT__Temp_events.dart';
-import '../../cubits/MQTT__Temp_states.dart';
-import '../../cubits/OxygenRate_events.dart';
-import '../../cubits/OxygenRate_states.dart';
+import 'package:grad_project/API_integration/models/patientmodel.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
-
-import '../core/widgets/AnimatedStatusIndicator.dart';
-import '../core/widgets/statusCards.dart';
-import '../cubits/HealthStatusEvents.dart';
-import '../cubits/HealthStatusState.dart';
+import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
+import 'package:grad_project/core/widgets/statusCards.dart';
+import 'package:grad_project/cubits/HealthStatusEvents.dart';
+import 'package:grad_project/cubits/HealthStatusState.dart';
+import 'package:grad_project/cubits/HeartRate_events.dart';
+import 'package:grad_project/cubits/HeartRate_states.dart';
+import 'package:grad_project/cubits/MQTT__Temp_events.dart';
+import 'package:grad_project/cubits/MQTT__Temp_states.dart';
+import 'package:grad_project/cubits/OxygenRate_events.dart';
+import 'package:grad_project/cubits/OxygenRate_states.dart';
 
 class CheckProfile extends StatelessWidget {
+  static const String routeName = 'CheckProfile';
   final Patient patient;
 
   const CheckProfile({super.key, required this.patient});
@@ -58,7 +57,7 @@ class CheckProfile extends StatelessWidget {
                     width: 120,
                     height: 60,
                     decoration: const BoxDecoration(
-                      color: Colors.black,
+                      color: Colors.transparent,
                       borderRadius: BorderRadius.vertical(
                         bottom: Radius.circular(30),
                       ),
@@ -68,7 +67,7 @@ class CheckProfile extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(18),
                         child: Image.asset(
-                          'assets/notch_image.png',
+                          'assets/profile.png',
                           fit: BoxFit.cover,
                         ),
                       ),

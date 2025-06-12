@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:grad_project/API_integration/models/patientmodel.dart';
 import 'package:grad_project/cubits/HealthStatusEvents.dart';
 import 'package:grad_project/cubits/HeartRate_events.dart';
 import 'package:grad_project/cubits/MQTT__Temp_events.dart';
@@ -13,6 +14,7 @@ import 'package:grad_project/pages/PatientHome.dart';
 import 'package:grad_project/pages/QRScanner.dart';
 import 'package:grad_project/pages/SignIn.dart';
 import 'package:grad_project/pages/SplashScreen.dart';
+import 'package:grad_project/pages/checkprofile.dart';
 import 'package:grad_project/pages/create_account_doctor.dart';
 import 'package:grad_project/pages/create_account_patient.dart';
 
@@ -71,8 +73,12 @@ class MyApp extends StatelessWidget {
             );
           },
           'CreateAccountScreenDoctor': (context) => const CreateAccountScreenDoctor(),
-          'QRScannerPage': (context) =>  QRScannerPage(),
+          'QRScannerPage': (context) =>  const QRScannerPage(),
           'ForgotPasswordPage': (context) => ForgotPasswordPage(),
+          'CheckProfile': (context) {
+            final args = ModalRoute.of(context)!.settings.arguments as Patient;
+            return CheckProfile(patient: args);
+          },
         },
       ),
     );

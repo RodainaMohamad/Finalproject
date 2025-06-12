@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/services/DeletePatient_service.dart';
 import 'package:grad_project/core/widgets/EditReport.dart';
+import 'package:grad_project/pages/checkprofile.dart';
 import '../../API_integration/models/patientmodel.dart';
 import 'addreport.dart';
 import '../../API_integration/models/PatientByIdModel.dart';
@@ -124,7 +125,11 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                                   Expanded(
                                     child: GestureDetector(
                                       onTap: () {
-                                        // Implement Check Profile
+                                        Navigator.pushNamed(
+                                          context,
+                                          'CheckProfile',
+                                          arguments: widget.patient, // Pass the patient object
+                                        );
                                       },
                                       child: Container(
                                         height: cardHeight * 0.18,
