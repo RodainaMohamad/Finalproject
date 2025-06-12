@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../core/widgets/BackButtonCircle.dart';
 import '../core/widgets/VerificationPage.dart';
 
@@ -122,7 +121,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
-        hintText: 'example@mail.com',
+        hintText: 'example@gmail.com',
         hintStyle: const TextStyle(color: Colors.white54),
         prefixIcon: const Icon(Icons.email, color: Colors.white),
         border: OutlineInputBorder(
