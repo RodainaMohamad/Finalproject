@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:grad_project/API_integration/models/GetNurseNodel.dart';
 import 'package:grad_project/API_integration/services/GetNurse_service.dart';
+import 'package:grad_project/core/widgets/addstaff.dart';
 import 'package:grad_project/core/widgets/staffcard.dart';
-import 'addstaff.dart';
 
-class StaffScreen extends StatefulWidget {
-  const StaffScreen({Key? key}) : super(key: key);
+class NurseListScreen extends StatefulWidget {
+  const NurseListScreen({Key? key}) : super(key: key);
 
   @override
-  State<StaffScreen> createState() => _StaffScreenState();
+  State<NurseListScreen> createState() => _NurseListScreenState();
 }
 
-class _StaffScreenState extends State<StaffScreen> {
+class _NurseListScreenState extends State<NurseListScreen> {
   bool _isExpanded = false;
-  late Future<List<Nurse>> _futureNurses;
-
-  final TextEditingController _searchController = TextEditingController();
-  List<Nurse> _searchResult = [];
-  bool _isSearching = false;
+  Future<List<Nurse>>? _futureNurses;
 
   @override
   void initState() {
     super.initState();
-    _futureNurses = NurseService().fetchNurses();
+    _loadNurses();
     Future.delayed(Duration.zero, () {
       setState(() {
         _isExpanded = true;
@@ -30,38 +26,9 @@ class _StaffScreenState extends State<StaffScreen> {
     });
   }
 
-  void _searchNurseById(String value) async {
-    if (value.isNotEmpty) {
-      try {
-        final nurse = await NurseService().fetchNurseById(int.parse(value));
-        setState(() {
-          _searchResult = [nurse];
-          _isSearching = true;
-        });
-      } catch (e) {
-        setState(() {
-          _searchResult = [];
-          _isSearching = true;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('No nurse found for ID: $value'),
-          ),
-        );
-      }
-    } else {
-      setState(() {
-        _isSearching = false;
-      });
-    }
-  }
-
-  void _refreshNurses() {
+  void _loadNurses() {
     setState(() {
       _futureNurses = NurseService().fetchNurses();
-      _searchResult = [];
-      _isSearching = false;
-      _searchController.clear();
     });
   }
 
@@ -83,56 +50,34 @@ class _StaffScreenState extends State<StaffScreen> {
             const Row(
               children: [
                 Expanded(
-                  child: Divider(color: Colors.white, thickness: 2, endIndent: 8),
-                ),
+                    child: Divider(color: Colors.white, thickness: 2, endIndent: 8)),
                 Text(
                   'My Staff',
                   style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
+                      fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
                 Expanded(
-                  child: Divider(color: Colors.white, thickness: 2, indent: 8),
-                ),
+                    child: Divider(color: Colors.white, thickness: 2, indent: 8)),
               ],
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
-                controller: _searchController,
-                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: Colors.white,
-                  hintText: 'Search by ID',
+                  hintText: 'Search',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                     borderSide: BorderSide.none,
                   ),
                 ),
-                onSubmitted: _searchNurseById,
               ),
             ),
             const SizedBox(height: 16),
             Expanded(
-              child: _isSearching
-                  ? _searchResult.isEmpty
-                  ? const Center(
-                  child: Text('No staff found',
-                      style: TextStyle(color: Colors.white)))
-                  : ListView.builder(
-                itemCount: _searchResult.length,
-                itemBuilder: (context, index) {
-                  return StaffCardWidget(
-                    nurse: _searchResult[index],
-                    onNurseDeleted: _refreshNurses,
-                  );
-                },
-              )
-                  : FutureBuilder<List<Nurse>>(
+              child: FutureBuilder<List<Nurse>>(
                 future: _futureNurses,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -141,7 +86,7 @@ class _StaffScreenState extends State<StaffScreen> {
                   } else if (snapshot.hasError) {
                     return Center(
                         child: Text('Error: ${snapshot.error}',
-                            style: const TextStyle(color: Colors.white)));
+                            style: TextStyle(color: Colors.white)));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                     return const Center(
                         child: Text('No staff found',
@@ -158,9 +103,12 @@ class _StaffScreenState extends State<StaffScreen> {
                     ),
                     itemCount: staffList.length,
                     itemBuilder: (context, index) {
-                      return StaffCardWidget(
-                        nurse: staffList[index],
-                        onNurseDeleted: _refreshNurses,
+                      return SizedBox(
+                        width: double.infinity,
+                        child: StaffCardWidget(
+                          nurse: staffList[index],
+                          onNurseDeleted: _loadNurses,
+                        ),
                       );
                     },
                   );
@@ -174,17 +122,15 @@ class _StaffScreenState extends State<StaffScreen> {
         onPressed: () async {
           final result = await showModalBottomSheet(
             context: context,
+            isScrollControlled: true,
             builder: (context) => const AddStaffScreen(),
           );
           if (result == true) {
-            _refreshNurses();
+            _loadNurses();
           }
         },
         backgroundColor: Colors.white,
-        child: const Icon(
-          Icons.add,
-          color: Color(0xFF52B696A),
-        ),
+        child: const Icon(Icons.add, color: Color(0xFF52B696A)),
       ),
     );
   }
