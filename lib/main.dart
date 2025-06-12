@@ -8,6 +8,7 @@ import 'package:grad_project/cubits/OxygenRate_events.dart';
 import 'package:grad_project/cubits/auth_events.dart';
 import 'package:grad_project/pages/DoctorPatient.dart';
 import 'package:grad_project/pages/Doctorhome.dart';
+import 'package:grad_project/pages/ForgotPasswordPage.dart';
 import 'package:grad_project/pages/PatientHome.dart';
 import 'package:grad_project/pages/QRScanner.dart';
 import 'package:grad_project/pages/SignIn.dart';
@@ -71,6 +72,7 @@ class MyApp extends StatelessWidget {
           },
           'CreateAccountScreenDoctor': (context) => const CreateAccountScreenDoctor(),
           'QRScannerPage': (context) =>  QRScannerPage(),
+          'ForgotPasswordPage': (context) => ForgotPasswordPage(),
         },
       ),
     );
