@@ -10,6 +10,7 @@ import 'package:grad_project/API_integration/services/VitalData_service.dart';
 import 'package:grad_project/API_integration/utility.dart';
 import 'package:grad_project/core/constants/colours/colours.dart';
 import 'package:grad_project/core/widgets/AnimatedStatusIndicator.dart';
+import 'package:grad_project/core/widgets/HealthDanger.dart';
 import 'package:grad_project/core/widgets/HomeBottomBar.dart';
 import 'package:grad_project/core/widgets/expansionTile.dart';
 import 'package:grad_project/core/widgets/PatientMenu.dart';
@@ -42,6 +43,7 @@ class _PatientHomeState extends State<PatientHome> {
   PatientByIdModel? _patientDetails;
   bool hasNotification = false;
   Timer? _notificationTimer;
+  bool _hasShownAlert = false;
 
   @override
   void initState() {
@@ -122,7 +124,9 @@ class _PatientHomeState extends State<PatientHome> {
     try {
       final tips = await VitalService().fetchHealthTips();
       setState(() {
-        hasNotification = tips.isNotEmpty && tips[0] != 'No health tips available yet.' && tips[0] != 'Error fetching health tips.';
+        hasNotification = tips.isNotEmpty &&
+            tips[0] != 'No health tips available yet.' &&
+            !tips[0].toLowerCase().contains('error');
       });
     } catch (e) {
       print('Error checking notifications: $e');
@@ -191,6 +195,7 @@ class _PatientHomeState extends State<PatientHome> {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
@@ -209,7 +214,23 @@ class _PatientHomeState extends State<PatientHome> {
           );
         }
         return Scaffold(
-          body: Container(
+          body: BlocListener<HealthStatusCubit, HealthStatusState>(
+            listener: (context, state) {
+              if (state.statusItemData.label == 'Bad' && !_hasShownAlert) {
+                _hasShownAlert = true;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const HealthDangerScreen()),
+                ).then((_) {
+                  if (mounted) {
+                    setState(() {
+                      _hasShownAlert = false; // Reset flag when returning
+                    });
+                  }
+                });
+              }
+            },
+            child:Container(
             height: height,
             width: width,
             decoration: BoxDecoration(
@@ -589,7 +610,7 @@ class _PatientHomeState extends State<PatientHome> {
               ],
             ),
           ),
-        );
+        ));
       },
     );
   }

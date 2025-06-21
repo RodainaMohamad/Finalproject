@@ -45,7 +45,7 @@ class HealthStatusCubit extends Cubit<HealthStatusState> {
 
     String statusLabel;
 
-    // Define normal and critical ranges
+    //  normal and critical ranges
     bool isHeartRateNormal = heartRate >= 60 && heartRate <= 100;
     bool isHeartRateSlightlyOff = (heartRate >= 50 && heartRate < 60) || (heartRate > 100 && heartRate <= 120);
     bool isHeartRateCritical = heartRate < 50 || heartRate > 120;
@@ -77,7 +77,6 @@ class HealthStatusCubit extends Cubit<HealthStatusState> {
 
   @override
   Future<void> close() {
-    // No need to close the dependent cubits here; they manage their own lifecycle
     return super.close();
   }
 }

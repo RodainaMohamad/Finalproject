@@ -50,8 +50,8 @@ class _AddDoctorScreenState extends State<AddDoctorScreen>
 
   Future<String?> _getToken() async {
     try {
-      final token = await _storage.read(key: 'auth_token');
-      print('Retrieved token: $token');
+      final token = await _storage.read(key: 'accessToken');
+      print('DEBUG: Retrieved token in AddDoctorScreen: $token');
       return token;
     } catch (e) {
       print('Error reading token: $e');

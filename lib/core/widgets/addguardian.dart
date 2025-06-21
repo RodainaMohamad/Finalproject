@@ -67,7 +67,9 @@ class _AddGuardianScreenState extends State<AddGuardianScreen>
 
   Future<String?> _getToken() async {
     try {
-      return await _storage.read(key: 'auth_token');
+      final token = await _storage.read(key: 'accessToken');
+      print('DEBUG: Retrieved token in AddGuardianScreen: $token');
+      return token;
     } catch (e) {
       print('Error reading token: $e');
       return null;

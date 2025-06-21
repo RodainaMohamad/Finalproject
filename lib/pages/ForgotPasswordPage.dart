@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/API_integration/services/ResetPassword_service.dart';
 import '../core/widgets/BackButtonCircle.dart';
 import '../core/widgets/VerificationPage.dart';
 
@@ -10,17 +11,15 @@ class ForgotPasswordPage extends StatefulWidget {
 }
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  bool _isEmailSelected = true;
-  String _selectedCountryCode = '+20';
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final List<String> _countryCodes = ['+20', '+966', '+971', '+973'];
+  final ResetPasswordService _resetPasswordService = ResetPasswordService();
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -46,7 +45,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Enter your email or your phone number, we will send you confirmation code',
+                      'Enter your email address, and we will send you a confirmation code to reset your password. Please check your spam/junk folder if you don\'t see the email.',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.9),
@@ -58,55 +57,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
                 Column(
                   children: [
-                    _buildToggleButtons(),
-                    const SizedBox(height: 30),
-                    _isEmailSelected ? _buildEmailField() : _buildPhoneField(),
+                    _buildEmailField(),
                     const SizedBox(height: 40),
                     _buildResetButton(),
                   ],
                 ),
-                BackButtonCircle(),
+                const BackButtonCircle(),
               ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToggleButtons() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          _buildToggleButton('Email', 0),
-          _buildToggleButton('Phone', 1),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildToggleButton(String text, int index) {
-    bool isSelected = _isEmailSelected == (index == 0);
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _isEmailSelected = index == 0),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Center(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: isSelected ? Color(0xff199A8E) : Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ),
         ),
@@ -118,6 +75,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return TextField(
       controller: _emailController,
       style: const TextStyle(color: Colors.white),
+      keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white.withOpacity(0.1),
@@ -132,72 +90,24 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  Widget _buildPhoneField() {
-    return Row(
-      children: [
-        Container(
-          width: 100,
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: DropdownButton<String>(
-            dropdownColor: Color(0xff2C5C5D),
-            value: _selectedCountryCode,
-            items: _countryCodes
-                .map((value) => DropdownMenuItem<String>(
-                      value: value,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: Text(
-                          value,
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ))
-                .toList(),
-            onChanged: (value) => setState(() => _selectedCountryCode = value!),
-            underline: const SizedBox(),
-            icon: const Icon(Icons.arrow_drop_down, color: Colors.white),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: TextField(
-            controller: _phoneController,
-            keyboardType: TextInputType.phone,
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.1),
-              hintText: '100 183 66 82',
-              hintStyle: const TextStyle(color: Colors.white54),
-              prefixIcon: const Icon(Icons.phone, color: Colors.white),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildResetButton() {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: _resetPassword,
+        onPressed: _isLoading ? null : _resetPassword,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xff199A8E),
+          backgroundColor: const Color(0xff199A8E),
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        child: Text(
-          'Reset Password',
+        child: _isLoading
+            ? const CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+        )
+            : const Text(
+          'Send Reset Code',
           style: TextStyle(
             color: Colors.white,
             fontSize: 16,
@@ -208,33 +118,84 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     );
   }
 
-  void _resetPassword() {
-    if (_isEmailSelected) {
-      final email = _emailController.text.trim();
-      if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
-        _showErrorPopup("You have entered wrong email");
-        return;
-      }
-    } else {
-      final phone = _phoneController.text.trim();
-      if (phone.isEmpty || phone.length < 8) {
-        _showErrorPopup("You have entered wrong phone number");
-        return;
-      }
+  Future<void> _resetPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
+      _showErrorPopup("Please enter a valid email address");
+      return;
     }
 
-    final contactInfo = _isEmailSelected
-        ? _emailController.text
-        : '$_selectedCountryCode${_phoneController.text}';
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => VerificationPage(contactInfo: contactInfo),
-      ),
-    );
+    setState(() {
+      _isLoading = true;
+    });
 
-    // هنا تقدر تضيف التنقل إلى صفحة التحقق
-    // Navigator.push(...);
+    try {
+      final success = await _resetPasswordService.forgotPassword(email);
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Reset code sent to your email. Please check your inbox or spam folder.'),
+              backgroundColor: Color(0xff199A8E),
+              duration: Duration(seconds: 5),
+            ),
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VerificationPage(contactInfo: email),
+            ),
+          );
+        }
+      } else {
+        _showErrorPopup("Failed to send reset code. Please try again or contact support.");
+      }
+    } catch (e) {
+      _showErrorPopup("Error: ${e.toString().replaceFirst('Exception: ', '')}");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _resendCode() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@') || !email.contains('.')) {
+      _showErrorPopup("Please enter a valid email address");
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _resetPasswordService.resendConfirmationEmail(email);
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Reset code resent to your email. Please check your inbox or spam folder.'),
+              backgroundColor: Color(0xff199A8E),
+              duration: Duration(seconds: 5),
+            ),
+          );
+        }
+      } else {
+        _showErrorPopup("Failed to resend reset code. Please try again or contact support.");
+      }
+    } catch (e) {
+      _showErrorPopup("Error: ${e.toString().replaceFirst('Exception: ', '')}");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _showErrorPopup(String message) {
@@ -296,7 +257,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-            )
+            ),
+            if (message.contains("Failed to send reset code"))
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _resendCode();
+                },
+                child: const Text(
+                  "Resend Code",
+                  style: TextStyle(
+                    color: Color(0xFF199A8E),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

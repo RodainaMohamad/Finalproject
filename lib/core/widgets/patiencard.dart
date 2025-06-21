@@ -255,7 +255,6 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                           ],
                         ),
                       );
-
                       if (confirmDelete) {
                         try {
                           final deleteService = DeletePatientService();
@@ -265,22 +264,14 @@ class _PatientCardWidgetState extends State<PatientCardWidget> {
                             token: token,
                           );
                           widget.onDeleted?.call();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  '${widget.patient.name} deleted successfully'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
+                          // Changed from SnackBar to print
+                          print('${widget.patient.name} deleted successfully');
                         } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Failed to delete patient: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                          // Changed from SnackBar to print
+                          print('Failed to delete patient: $e');
                         }
                       }
+
                     } else if (value == 'edit') {
                       if (widget.reports != null && widget.reports!.isNotEmpty) {
                         await showDialog(

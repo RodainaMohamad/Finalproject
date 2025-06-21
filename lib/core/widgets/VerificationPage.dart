@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:grad_project/API_integration/services/ResetPassword_service.dart';
 import 'package:pinput/pinput.dart';
-
+import 'package:grad_project/API_integration/models/ResetPasswordModel.dart';
 import 'BackButtonCircle.dart';
 import 'CreateNewPasswordPage.dart';
 
 class VerificationPage extends StatefulWidget {
   final String contactInfo;
 
-  const VerificationPage({required this.contactInfo});
+  const VerificationPage({Key? key, required this.contactInfo}) : super(key: key);
 
   @override
   _VerificationPageState createState() => _VerificationPageState();
 }
 
 class _VerificationPageState extends State<VerificationPage> {
-  TextEditingController pinController = TextEditingController();
-  bool isLoading = false;
+  final TextEditingController pinController = TextEditingController();
+  final ResetPasswordService _resetPasswordService = ResetPasswordService();
+  bool _isLoading = false;
 
   final defaultPinTheme = PinTheme(
     width: 56,
@@ -29,6 +31,142 @@ class _VerificationPageState extends State<VerificationPage> {
       borderRadius: BorderRadius.circular(8),
     ),
   );
+
+  Future<void> _verifyCode() async {
+    final code = pinController.text.trim();
+    if (code.isEmpty || code.length != 4) {
+      _showError('Please enter a valid 4-digit code');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Temporary model to verify the code (assuming CreateNewPasswordPage handles password)
+      final model = ResetPasswordModel(
+        email: widget.contactInfo,
+        resetCode: code,
+        newPassword: null, // Password will be set in CreateNewPasswordPage
+      );
+      final success = await _resetPasswordService.resetPassword(model);
+      print('ResetPassword API call: Email=${model.email}, Code=$code, Success=$success');
+      if (success) {
+        if (mounted) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreateNewPasswordPage(email: widget.contactInfo, resetCode: code),
+            ),
+          );
+        }
+      } else {
+        _showError('Failed to verify code. Please check the code and try again.');
+      }
+    } catch (e) {
+      print('ResetPassword error: $e');
+      _showError('Error: ${e.toString().replaceFirst('Exception: ', '')}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _resendCode() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _resetPasswordService.resendConfirmationEmail(widget.contactInfo);
+      print('ResendConfirmationEmail API call: Email=${widget.contactInfo}, Success=$success');
+      if (success) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('New code sent to your email. Please check your inbox or spam folder.'),
+              backgroundColor: Color(0xFF199A8E),
+              duration: Duration(seconds: 4),
+            ),
+          );
+        }
+      } else {
+        _showError('Failed to resend code. Please try again or contact support.');
+      }
+    } catch (e) {
+      print('ResendConfirmationEmail error: $e');
+      _showError('Error: ${e.toString().replaceFirst('Exception: ', '')}');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        contentPadding: const EdgeInsets.all(24.0),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              backgroundColor: Colors.red,
+              radius: 40,
+              child: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 40,
+              ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Failed',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style: const TextStyle(color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF199A8E),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              ),
+              onPressed: () => Navigator.pop(context),
+              child: const Text(
+                'Retry',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +188,7 @@ class _VerificationPageState extends State<VerificationPage> {
                 Column(
                   children: [
                     const Text(
-                      'Enter Verification Code',
+                      'Email verification',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -62,7 +200,7 @@ class _VerificationPageState extends State<VerificationPage> {
                       'Enter code that we have sent to\n${widget.contactInfo}',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: Colors.white70,
+                        color: Colors.black87,
                         fontSize: 16,
                       ),
                     ),
@@ -78,7 +216,7 @@ class _VerificationPageState extends State<VerificationPage> {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: isLoading ? null : _verifyCode,
+                        onPressed: _isLoading ? null : _verifyCode,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF199A8E),
                           foregroundColor: Colors.white,
@@ -87,24 +225,25 @@ class _VerificationPageState extends State<VerificationPage> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        child: isLoading
+                        child: _isLoading
                             ? const CircularProgressIndicator(
-                                color: Colors.white)
+                          color: Colors.white,
+                        )
                             : const Text(
-                                'Verify',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                          'Verify',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
                     TextButton(
-                      onPressed: _resendCode,
+                      onPressed: _isLoading ? null : _resendCode,
                       child: const Text(
-                        'Didn\'t receive the code? Resend',
+                        'Resend code',
                         style: TextStyle(
                           color: Colors.white,
                           decoration: TextDecoration.underline,
@@ -113,98 +252,10 @@ class _VerificationPageState extends State<VerificationPage> {
                     ),
                   ],
                 ),
-                BackButtonCircle(), // هنا يتم استدعاء الأداة
+                const BackButtonCircle(),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  void _resendCode() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('New code has been sent'),
-        backgroundColor: Color(0xFF2C5C5D),
-      ),
-    );
-  }
-
-  void _verifyCode() {
-    if (pinController.text.length != 4) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter complete code'),
-          backgroundColor: Color(0xFF2C5C5D),
-        ),
-      );
-      return;
-    }
-
-    setState(() => isLoading = true);
-
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() => isLoading = false);
-      if (pinController.text == "1234") {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => CreateNewPasswordPage()),
-        );
-      } else {
-        _showFailedDialog();
-      }
-    });
-  }
-
-  void _showFailedDialog() {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        contentPadding: const EdgeInsets.all(24),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CircleAvatar(
-              backgroundColor: Colors.red, // لون الدايرة الأحمر
-              radius: 40,
-              child: const Icon(
-                Icons.close,
-                color: Colors.white, // لون علامة الغلط أبيض
-                size: 50,
-              ),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Failed',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'You have entered wrong code',
-              style: TextStyle(color: Colors.grey),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF199A8E),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30)),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
-              ),
-              onPressed: () => Navigator.pop(context),
-              child: const Text(
-                'Retry',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
-            )
-          ],
         ),
       ),
     );

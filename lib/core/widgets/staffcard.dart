@@ -104,11 +104,12 @@ class StaffCardWidget extends StatelessWidget {
                       // Notify parent to refresh the list
                       onNurseDeleted();
                       // Show success message
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Nurse ${nurse.name} deleted successfully'),
-                        ),
-                      );
+                      // ScaffoldMessenger.of(context).showSnackBar(
+                      //   SnackBar(
+                      //     content: Text('Nurse ${nurse.name} deleted successfully'),
+                      //   ),
+                      // );
+                      print(Text('Nurse ${nurse.name} deleted successfully'));
                     } catch (e) {
                       // Show error message
                       ScaffoldMessenger.of(context).showSnackBar(

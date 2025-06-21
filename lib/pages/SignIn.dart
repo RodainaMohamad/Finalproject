@@ -280,6 +280,23 @@ class _Signin extends State<Signin> {
                                   return null;
                                 },
                               ),
+                              const SizedBox(height: 8.0),
+                              GestureDetector(
+                                // onTap: () {
+                                //   Navigator.pushNamed(context, 'ForgotPasswordPage');
+                                // },
+                                onTap: () {
+                                  Navigator.pushNamed(context, 'SimulatedPasswordResetPage');
+                                },
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: secondary,
+                                  ),
+                                ),
+                              ),
                               const SizedBox(height: 30),
                             ],
                           ),
